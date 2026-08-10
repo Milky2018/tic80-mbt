@@ -27,7 +27,7 @@ pub fn boot() -> Unit {
   @tic80.memset(0, 0, 0)
   let tile = @tic80.mget(0, 0)
   @tic80.mset(0, 0, tile)
-  @tic80.mouse(scratch_addr)
+  ignore(@tic80.mouse())
   @tic80.music()
   ignore(@tic80.pix(0, 0))
   let byte = @tic80.peek(0)

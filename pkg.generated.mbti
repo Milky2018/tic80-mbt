@@ -1,6 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "Milky2018/tic80"
 
+import {
+  "moonbitlang/core/debug",
+}
+
 // Values
 pub fn btn(id? : Int) -> Int
 
@@ -22,7 +26,7 @@ pub fn exit() -> Unit
 
 pub fn fget(Int, Int) -> Bool
 
-pub fn font(Int, Int, Int, transparent_colors_addr? : Int, color_count? : Int, char_width? : Int, char_height? : Int, fixed? : Bool, scale? : Int, alt? : Bool) -> Int
+pub fn font(Int, Int, Int, transparent_colors? : Bytes, char_width? : Int, char_height? : Int, fixed? : Bool, scale? : Int, alt? : Bool) -> Int
 
 pub fn fset(Int, Int, Bool) -> Unit
 
@@ -40,7 +44,7 @@ pub fn memset(Int, Int, Int) -> Unit
 
 pub fn mget(Int, Int) -> Int
 
-pub fn mouse(Int) -> Unit
+pub fn mouse() -> MouseState
 
 pub fn mset(Int, Int, Int) -> Unit
 
@@ -74,7 +78,7 @@ pub fn rectb(Int, Int, Int, Int, Int) -> Unit
 
 pub fn sfx(Int, note? : Int, octave? : Int, duration? : Int, channel? : Int, volume_left? : Int, volume_right? : Int, speed? : Int) -> Unit
 
-pub fn spr(Int, Int, Int, transparent_colors_addr? : Int, color_count? : Int, scale? : Int, flip? : Int, rotate? : Int, w? : Int, h? : Int) -> Unit
+pub fn spr(Int, Int, Int, transparent_colors? : Bytes, scale? : Int, flip? : Int, rotate? : Int, w? : Int, h? : Int) -> Unit
 
 pub fn sync(mask? : Int, bank? : Int, to_cart? : Bool) -> Unit
 
@@ -88,13 +92,22 @@ pub fn trib(Float, Float, Float, Float, Float, Float, Int) -> Unit
 
 pub fn tstamp() -> UInt
 
-pub fn ttri(Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, texture_source? : Int, transparent_colors_addr? : Int, color_count? : Int, z1? : Float, z2? : Float, z3? : Float, depth? : Bool) -> Unit
+pub fn ttri(Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, texture_source? : Int, transparent_colors? : Bytes, z1? : Float, z2? : Float, z3? : Float, depth? : Bool) -> Unit
 
 pub fn vbank(Int) -> Byte
 
 // Errors
 
 // Types and methods
+pub(all) struct MouseState {
+  x : Int
+  y : Int
+  scroll_x : Int
+  scroll_y : Int
+  left : Bool
+  middle : Bool
+  right : Bool
+} derive(Eq, @debug.Debug)
 
 // Type aliases
 

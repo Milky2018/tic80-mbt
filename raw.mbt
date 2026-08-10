@@ -1,8 +1,8 @@
-// Raw TIC-80 WebAssembly host imports.
+// TIC-80 WebAssembly API wrappers.
 //
 // The signatures mirror `linkTicAPI` from TIC-80 commit
 // `4aba09c98f1e5028b82765be1647677b08d35942`.
-// Pointer arguments are byte offsets in the imported linear memory.
+// Remaining address arguments are byte offsets in the imported linear memory.
 
 ///|
 /// Returns the selected button state, or the button bit mask when `id` is -1.
@@ -40,18 +40,46 @@ pub fn fset(id : Int, flag : Int, value : Bool) -> Unit = "env" "fset"
 
 ///|
 /// `text_addr` must point to a null-terminated string. Transparent colors are
-/// read from `transparent_colors_addr` for `color_count` bytes.
+/// passed directly from `transparent_colors`.
 pub fn font(
   text_addr : Int,
   x : Int,
   y : Int,
-  transparent_colors_addr? : Int = 0,
-  color_count? : Int = 0,
+  transparent_colors? : Bytes = b"",
   char_width? : Int = -1,
   char_height? : Int = -1,
   fixed? : Bool = false,
   scale? : Int = -1,
   alt? : Bool = false,
+) -> Int {
+  host_font(
+    text_addr,
+    x,
+    y,
+    transparent_colors,
+    transparent_colors.length(),
+    char_width,
+    char_height,
+    fixed,
+    scale,
+    alt,
+  )
+}
+
+///|
+#unsafe_skip_stub_check
+#borrow(transparent_colors)
+fn host_font(
+  text_addr : Int,
+  x : Int,
+  y : Int,
+  transparent_colors : Bytes,
+  color_count : Int,
+  char_width : Int,
+  char_height : Int,
+  fixed : Bool,
+  scale : Int,
+  alt : Bool,
 ) -> Int = "env" "font"
 
 ///|
@@ -98,10 +126,61 @@ pub fn mget(x : Int, y : Int) -> Int = "env" "mget"
 pub fn mset(x : Int, y : Int, tile_id : Int) -> Unit = "env" "mset"
 
 ///|
-/// Writes the current mouse state to `data_addr`. The record uses little-endian
-/// i16 values for x/y at offsets 0/2, followed by scroll x/y and left/middle/
-/// right button bytes at offsets 4 through 8.
-pub fn mouse(data_addr : Int) -> Unit = "env" "mouse"
+pub(all) struct MouseState {
+  x : Int
+  y : Int
+  scroll_x : Int
+  scroll_y : Int
+  left : Bool
+  middle : Bool
+  right : Bool
+} derive(Debug, Eq)
+
+///|
+/// Returns an independent snapshot of the current mouse state.
+pub fn mouse() -> MouseState {
+  let buffer = FixedArray::make(9, b'\x00')
+  host_mouse(buffer)
+  decode_mouse_state(buffer)
+}
+
+///|
+#unsafe_skip_stub_check
+#borrow(buffer)
+fn host_mouse(buffer : FixedArray[Byte]) -> Unit = "env" "mouse"
+
+///|
+fn decode_mouse_state(buffer : FixedArray[Byte]) -> MouseState {
+  {
+    x: decode_i16_le(buffer, 0),
+    y: decode_i16_le(buffer, 2),
+    scroll_x: decode_i8(buffer[4]),
+    scroll_y: decode_i8(buffer[5]),
+    left: buffer[6] != b'\x00',
+    middle: buffer[7] != b'\x00',
+    right: buffer[8] != b'\x00',
+  }
+}
+
+///|
+fn decode_i16_le(buffer : FixedArray[Byte], offset : Int) -> Int {
+  let bits = buffer[offset].to_int() | (buffer[offset + 1].to_int() << 8)
+  if (bits & 0x8000) != 0 {
+    bits - 0x10000
+  } else {
+    bits
+  }
+}
+
+///|
+fn decode_i8(byte : Byte) -> Int {
+  let bits = byte.to_int()
+  if (bits & 0x80) != 0 {
+    bits - 0x100
+  } else {
+    bits
+  }
+}
 
 ///|
 pub fn music(
@@ -178,19 +257,46 @@ pub fn sfx(
 ) -> Unit = "env" "sfx"
 
 ///|
-/// Transparent colors are read from `transparent_colors_addr` for
-/// `color_count` bytes.
+/// Transparent colors are passed directly from `transparent_colors`.
 pub fn spr(
   id : Int,
   x : Int,
   y : Int,
-  transparent_colors_addr? : Int = 0,
-  color_count? : Int = 0,
+  transparent_colors? : Bytes = b"",
   scale? : Int = -1,
   flip? : Int = -1,
   rotate? : Int = -1,
   w? : Int = -1,
   h? : Int = -1,
+) -> Unit {
+  host_spr(
+    id,
+    x,
+    y,
+    transparent_colors,
+    transparent_colors.length(),
+    scale,
+    flip,
+    rotate,
+    w,
+    h,
+  )
+}
+
+///|
+#unsafe_skip_stub_check
+#borrow(transparent_colors)
+fn host_spr(
+  id : Int,
+  x : Int,
+  y : Int,
+  transparent_colors : Bytes,
+  color_count : Int,
+  scale : Int,
+  flip : Int,
+  rotate : Int,
+  w : Int,
+  h : Int,
 ) -> Unit = "env" "spr"
 
 ///|
@@ -233,8 +339,7 @@ pub fn trib(
 ) -> Unit = "env" "trib"
 
 ///|
-/// Transparent colors are read from `transparent_colors_addr` for
-/// `color_count` bytes.
+/// Transparent colors are passed directly from `transparent_colors`.
 pub fn ttri(
   x1 : Float,
   y1 : Float,
@@ -249,12 +354,58 @@ pub fn ttri(
   u3 : Float,
   v3 : Float,
   texture_source? : Int = 0,
-  transparent_colors_addr? : Int = 0,
-  color_count? : Int = 0,
+  transparent_colors? : Bytes = b"",
   z1? : Float = 0.0,
   z2? : Float = 0.0,
   z3? : Float = 0.0,
   depth? : Bool = false,
+) -> Unit {
+  host_ttri(
+    x1,
+    y1,
+    x2,
+    y2,
+    x3,
+    y3,
+    u1,
+    v1,
+    u2,
+    v2,
+    u3,
+    v3,
+    texture_source,
+    transparent_colors,
+    transparent_colors.length(),
+    z1,
+    z2,
+    z3,
+    depth,
+  )
+}
+
+///|
+#unsafe_skip_stub_check
+#borrow(transparent_colors)
+fn host_ttri(
+  x1 : Float,
+  y1 : Float,
+  x2 : Float,
+  y2 : Float,
+  x3 : Float,
+  y3 : Float,
+  u1 : Float,
+  v1 : Float,
+  u2 : Float,
+  v2 : Float,
+  u3 : Float,
+  v3 : Float,
+  texture_source : Int,
+  transparent_colors : Bytes,
+  color_count : Int,
+  z1 : Float,
+  z2 : Float,
+  z3 : Float,
+  depth : Bool,
 ) -> Unit = "env" "ttri"
 
 ///|
