@@ -1,0 +1,101 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Milky2018/tic80"
+
+// Values
+pub fn btn(id? : Int) -> Int
+
+pub fn btnp(id? : Int, hold? : Int, period? : Int) -> Bool
+
+pub fn circ(Int, Int, Int, Int) -> Unit
+
+pub fn circb(Int, Int, Int, Int) -> Unit
+
+pub fn clip(x? : Int, y? : Int, w? : Int, h? : Int) -> Unit
+
+pub fn cls(color? : Int) -> Unit
+
+pub fn elli(Int, Int, Int, Int, Int) -> Unit
+
+pub fn ellib(Int, Int, Int, Int, Int) -> Unit
+
+pub fn exit() -> Unit
+
+pub fn fget(Int, Int) -> Bool
+
+pub fn font(Int, Int, Int, transparent_colors_addr? : Int, color_count? : Int, char_width? : Int, char_height? : Int, fixed? : Bool, scale? : Int, alt? : Bool) -> Int
+
+pub fn fset(Int, Int, Bool) -> Unit
+
+pub fn key(keycode? : Int) -> Bool
+
+pub fn keyp(keycode? : Int, hold? : Int, period? : Int) -> Bool
+
+pub fn line(Float, Float, Float, Float, Int) -> Unit
+
+pub fn map(x? : Int, y? : Int, w? : Int, h? : Int, sx? : Int, sy? : Int, transparent_colors_addr? : Int, color_count? : Int, scale? : Int, map_data_addr? : Int) -> Unit
+
+pub fn memcpy(Int, Int, Int) -> Unit
+
+pub fn memset(Int, Int, Int) -> Unit
+
+pub fn mget(Int, Int) -> Int
+
+pub fn mouse(Int) -> Unit
+
+pub fn mset(Int, Int, Int) -> Unit
+
+pub fn music(track? : Int, frame? : Int, row? : Int, loop_? : Bool, sustain? : Bool, tempo? : Int, speed? : Int) -> Unit
+
+pub fn peek(Int, bits? : Int) -> Byte
+
+pub fn peek1(Int) -> Byte
+
+pub fn peek2(Int) -> Byte
+
+pub fn peek4(Int) -> Byte
+
+pub fn pix(Int, Int, color? : Int) -> Byte
+
+pub fn pmem(Int, value? : Int64) -> UInt
+
+pub fn poke(Int, Int, bits? : Int) -> Unit
+
+pub fn poke1(Int, Int) -> Unit
+
+pub fn poke2(Int, Int) -> Unit
+
+pub fn poke4(Int, Int) -> Unit
+
+pub fn print(Int, Int, Int, color? : Int, fixed? : Bool, scale? : Int, small_font? : Bool) -> Int
+
+pub fn rect(Int, Int, Int, Int, Int) -> Unit
+
+pub fn rectb(Int, Int, Int, Int, Int) -> Unit
+
+pub fn sfx(Int, note? : Int, octave? : Int, duration? : Int, channel? : Int, volume_left? : Int, volume_right? : Int, speed? : Int) -> Unit
+
+pub fn spr(Int, Int, Int, transparent_colors_addr? : Int, color_count? : Int, scale? : Int, flip? : Int, rotate? : Int, w? : Int, h? : Int) -> Unit
+
+pub fn sync(mask? : Int, bank? : Int, to_cart? : Bool) -> Unit
+
+pub fn time() -> Float
+
+pub fn trace(Int, color? : Int) -> Unit
+
+pub fn tri(Float, Float, Float, Float, Float, Float, Int) -> Unit
+
+pub fn trib(Float, Float, Float, Float, Float, Float, Int) -> Unit
+
+pub fn tstamp() -> UInt
+
+pub fn ttri(Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, texture_source? : Int, transparent_colors_addr? : Int, color_count? : Int, z1? : Float, z2? : Float, z3? : Float, depth? : Bool) -> Unit
+
+pub fn vbank(Int) -> Byte
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

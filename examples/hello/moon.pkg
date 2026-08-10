@@ -1,0 +1,13 @@
+import {
+  "Milky2018/tic80",
+}
+
+options(
+  link: {
+    "wasm": {
+      "exports": [ "tic:TIC", "boot:BOOT" ],
+      "import-memory": { "module": "env", "name": "memory" },
+      "heap-start-address": 98304,
+    },
+  },
+)
