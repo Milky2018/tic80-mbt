@@ -88,7 +88,7 @@ pub fn rectb(Int, Int, Int, Int, Int) -> Unit
 
 pub fn sfx(Int, note? : Int, octave? : Int, duration? : Int, channel? : Int, volume_left? : Int, volume_right? : Int, speed? : Int) -> Unit
 
-pub fn spr(Int, Int, Int, transparent_colors? : Bytes, scale? : Int, flip? : Int, rotate? : Int, w? : Int, h? : Int) -> Unit
+pub fn spr(Int, Int, Int, transparent_colors? : Bytes, scale? : Int, flip? : Flip, rotate? : Rotation, w? : Int, h? : Int) -> Unit
 
 pub fn sync(mask? : Int, bank? : Int, to_cart? : Bool) -> Unit
 
@@ -149,6 +149,13 @@ pub struct ButtonState {
 } derive(Eq, @debug.Debug)
 pub fn ButtonState::any(Self) -> Bool
 pub fn ButtonState::held(Self, Button) -> Bool
+
+pub(all) enum Flip {
+  NoFlip
+  Horizontal
+  Vertical
+  Both
+} derive(Eq, @debug.Debug)
 
 pub(all) enum Key {
   A
@@ -249,8 +256,8 @@ pub(all) enum Key {
 
 pub(all) struct MapRemapResult {
   tile_id : Int
-  flip : Int
-  rotate : Int
+  flip : Flip
+  rotate : Rotation
 } derive(Eq, @debug.Debug)
 
 pub(all) struct MouseState {
@@ -261,6 +268,13 @@ pub(all) struct MouseState {
   left : Bool
   middle : Bool
   right : Bool
+} derive(Eq, @debug.Debug)
+
+pub(all) enum Rotation {
+  NoRotation
+  Clockwise90
+  Clockwise180
+  Clockwise270
 } derive(Eq, @debug.Debug)
 
 // Type aliases

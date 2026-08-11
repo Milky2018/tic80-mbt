@@ -317,13 +317,37 @@ pub fn line(
 ) -> Unit = "env" "line"
 
 ///|
+/// A sprite or map tile flip applied by TIC-80.
+pub(all) enum Flip {
+  NoFlip = 0
+  Horizontal = 1
+  Vertical = 2
+  Both = 3
+} derive(Debug, Eq)
+
+///|
+fn Flip::to_int(self : Flip) -> Int = "%identity"
+
+///|
+/// A clockwise sprite or map tile rotation applied by TIC-80.
+pub(all) enum Rotation {
+  NoRotation = 0
+  Clockwise90 = 1
+  Clockwise180 = 2
+  Clockwise270 = 3
+} derive(Debug, Eq)
+
+///|
+fn Rotation::to_int(self : Rotation) -> Int = "%identity"
+
+///|
 /// The current tile state passed to a map remap callback, and the replacement
 /// state returned by it.
 #valtype
 pub(all) struct MapRemapResult {
   tile_id : Int
-  flip : Int
-  rotate : Int
+  flip : Flip
+  rotate : Rotation
 } derive(Debug, Eq)
 
 ///|
@@ -392,13 +416,33 @@ let map_remap_trampoline_ref : FuncRef[
 ] = fn(remap, x, y, result_buffer) {
   let current : MapRemapResult = {
     tile_id: result_buffer[0].to_int(),
-    flip: decode_i32_le(result_buffer, 4),
-    rotate: decode_i32_le(result_buffer, 8),
+    flip: decode_flip(decode_i32_le(result_buffer, 4)),
+    rotate: decode_rotation(decode_i32_le(result_buffer, 8)),
   }
   let replacement = remap(current, x, y)
   result_buffer[0] = replacement.tile_id.to_byte()
-  encode_i32_le(result_buffer, 4, replacement.flip)
-  encode_i32_le(result_buffer, 8, replacement.rotate)
+  encode_i32_le(result_buffer, 4, replacement.flip.to_int())
+  encode_i32_le(result_buffer, 8, replacement.rotate.to_int())
+}
+
+///|
+fn decode_flip(value : Int) -> Flip {
+  match value & 3 {
+    0 => NoFlip
+    1 => Horizontal
+    2 => Vertical
+    _ => Both
+  }
+}
+
+///|
+fn decode_rotation(value : Int) -> Rotation {
+  match value & 3 {
+    0 => NoRotation
+    1 => Clockwise90
+    2 => Clockwise180
+    _ => Clockwise270
+  }
 }
 
 ///|
@@ -599,11 +643,11 @@ pub fn spr(
   x : Int,
   y : Int,
   transparent_colors? : Bytes = b"",
-  scale? : Int = -1,
-  flip? : Int = -1,
-  rotate? : Int = -1,
-  w? : Int = -1,
-  h? : Int = -1,
+  scale? : Int = 1,
+  flip? : Flip = NoFlip,
+  rotate? : Rotation = NoRotation,
+  w? : Int = 1,
+  h? : Int = 1,
 ) -> Unit {
   host_spr(
     id,
@@ -612,8 +656,8 @@ pub fn spr(
     transparent_colors,
     transparent_colors.length(),
     scale,
-    flip,
-    rotate,
+    flip.to_int(),
+    rotate.to_int(),
     w,
     h,
   )

@@ -22,24 +22,56 @@ test "decode mouse state" {
 ///|
 test "map remap trampoline" {
   let buffer : FixedArray[Byte] = [
-    b'\x07', b'\x00', b'\x00', b'\x00', b'\x02', b'\x00', b'\x00', b'\x00', b'\xfd',
-    b'\xff', b'\xff', b'\xff',
+    b'\x07', b'\x00', b'\x00', b'\x00', b'\x02', b'\x00', b'\x00', b'\x00', b'\x03',
+    b'\x00', b'\x00', b'\x00',
   ]
   let remap : FuncRef[(MapRemapResult, Int, Int) -> MapRemapResult] = fn(
     current,
     x,
-    y,
+    _y,
   ) {
     {
       tile_id: current.tile_id + x,
-      flip: current.flip + y,
-      rotate: -current.rotate,
+      flip: if current.flip == Vertical {
+        Horizontal
+      } else {
+        NoFlip
+      },
+      rotate: if current.rotate == Clockwise270 {
+        Clockwise90
+      } else {
+        NoRotation
+      },
     }
   }
   map_remap_trampoline_ref(remap, 4, 3, buffer)
   assert_eq(buffer[0], b'\x0b')
-  assert_eq(decode_i32_le(buffer, 4), 5)
-  assert_eq(decode_i32_le(buffer, 8), 3)
+  assert_eq(decode_i32_le(buffer, 4), 1)
+  assert_eq(decode_i32_le(buffer, 8), 1)
+}
+
+///|
+test "sprite transforms match the TIC-80 ABI" {
+  let flips : Array[(Flip, Int)] = [
+    (NoFlip, 0),
+    (Horizontal, 1),
+    (Vertical, 2),
+    (Both, 3),
+  ]
+  for pair in flips {
+    assert_eq(pair.0.to_int(), pair.1)
+    assert_eq(decode_flip(pair.1), pair.0)
+  }
+  let rotations : Array[(Rotation, Int)] = [
+    (NoRotation, 0),
+    (Clockwise90, 1),
+    (Clockwise180, 2),
+    (Clockwise270, 3),
+  ]
+  for pair in rotations {
+    assert_eq(pair.0.to_int(), pair.1)
+    assert_eq(decode_rotation(pair.1), pair.0)
+  }
 }
 
 ///|
