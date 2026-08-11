@@ -558,8 +558,19 @@ pub fn music(
 ) -> Unit = "env" "music"
 
 ///|
-/// Draws a pixel, or returns its color when `color` is negative.
-pub fn pix(x : Int, y : Int, color? : Int = -1) -> Byte = "env" "pix"
+/// Returns the color of a pixel.
+pub fn pix(x : Int, y : Int) -> Byte {
+  raw_pix(x, y, -1)
+}
+
+///|
+/// Draws a pixel.
+pub fn pix_set(x : Int, y : Int, color : Int) -> Unit {
+  ignore(raw_pix(x, y, color))
+}
+
+///|
+fn raw_pix(x : Int, y : Int, color : Int) -> Byte = "env" "pix"
 
 ///|
 pub fn peek(address : Int, bits? : Int = 8) -> Byte = "env" "peek"

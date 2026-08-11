@@ -68,7 +68,9 @@ pub fn peek2(Int) -> Byte
 
 pub fn peek4(Int) -> Byte
 
-pub fn pix(Int, Int, color? : Int) -> Byte
+pub fn pix(Int, Int) -> Byte
+
+pub fn pix_set(Int, Int, Int) -> Unit
 
 pub fn pmem(Int) -> UInt
 
