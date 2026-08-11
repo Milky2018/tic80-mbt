@@ -48,6 +48,31 @@ cartridge with the WebAssembly backend, for example:
 moon build --target wasm --release examples/hello
 ```
 
+## Video banks
+
+TIC-80 provides two 16 KiB video-memory banks, represented by `VideoBank`.
+Drawing commands and direct access to VRAM operate on the currently selected
+bank. `Bank1` is composited over `Bank0`; pixels matching `Bank1`'s clear color
+are transparent and reveal `Bank0` underneath.
+
+Use `vbank()` to query the current drawing target without changing it. Use
+`vbank_set()` to select a target; it returns the previously selected bank so a
+temporary switch can be restored without assuming which bank was active:
+
+```mbt nocheck
+let previous = @tic80.vbank_set(Bank1)
+// Drawing here targets Bank1.
+@tic80.cls(0)
+@tic80.print("overlay", x=8, y=8)
+ignore(@tic80.vbank_set(previous))
+```
+
+Video banks are available in both the free and Pro editions. They are separate
+from the cartridge resource banks addressed by the `bank` argument of
+`sync()`: `vbank_set()` changes the active VRAM drawing target, while `sync()`
+copies tiles, sprites, maps, audio, palettes, flags, or screen data between a
+cartridge resource bank and runtime memory.
+
 ## Cartridge callbacks
 
 TIC-80 cartridge callbacks are functions exported by the WebAssembly module

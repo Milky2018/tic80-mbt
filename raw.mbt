@@ -865,4 +865,49 @@ fn host_ttri(
 ) -> Unit = "env" "ttri"
 
 ///|
-pub fn vbank(bank : Int) -> Byte = "env" "vbank"
+/// One of TIC-80's two 16 KiB video-memory banks.
+///
+/// Drawing commands and direct VRAM access operate on the selected bank.
+/// `Bank1` is composited over `Bank0`; pixels matching `Bank1`'s clear color
+/// are transparent and reveal `Bank0`. Video banks are always available and
+/// are unrelated to the cartridge resource banks selected by `sync`.
+pub(all) enum VideoBank {
+  Bank0 = 0
+  Bank1 = 1
+} derive(Debug, Eq)
+
+///|
+fn VideoBank::to_int(self : VideoBank) -> Int = "%identity"
+
+///|
+/// Returns the currently selected video bank without changing it.
+///
+/// Use `vbank_set` when subsequent drawing or direct VRAM operations should
+/// target a different bank.
+pub fn vbank() -> VideoBank {
+  decode_video_bank(raw_vbank(-1))
+}
+
+///|
+/// Selects the video bank used by subsequent drawing and direct VRAM
+/// operations, and returns the previously selected bank.
+///
+/// The return value makes temporary switching straightforward: save it, draw
+/// into another bank, then pass it back to `vbank_set` to restore the previous
+/// target. This only switches VRAM; it does not select a cartridge resource
+/// bank for `sync`.
+pub fn vbank_set(bank : VideoBank) -> VideoBank {
+  decode_video_bank(raw_vbank(bank.to_int()))
+}
+
+///|
+fn decode_video_bank(value : Byte) -> VideoBank {
+  if value == b'\x00' {
+    Bank0
+  } else {
+    Bank1
+  }
+}
+
+///|
+fn raw_vbank(bank : Int) -> Byte = "env" "vbank"

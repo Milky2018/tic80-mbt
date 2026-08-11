@@ -254,3 +254,11 @@ test "sync sections match the TIC-80 ABI" {
   assert_eq(encode_sync_mask([]), 0)
   assert_eq(encode_sync_mask([Tiles, Map, Screen]), 0x85)
 }
+
+///|
+test "video banks match the TIC-80 ABI" {
+  assert_eq(Bank0.to_int(), 0)
+  assert_eq(Bank1.to_int(), 1)
+  assert_eq(decode_video_bank(b'\x00'), Bank0)
+  assert_eq(decode_video_bank(b'\x01'), Bank1)
+}

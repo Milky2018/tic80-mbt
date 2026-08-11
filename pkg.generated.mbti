@@ -110,7 +110,9 @@ pub fn tstamp() -> UInt
 
 pub fn ttri(Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, texture_source? : Int, transparent_colors? : Bytes, z1? : Float, z2? : Float, z3? : Float, depth? : Bool) -> Unit
 
-pub fn vbank(Int) -> Byte
+pub fn vbank() -> VideoBank
+
+pub fn vbank_set(VideoBank) -> VideoBank
 
 // Errors
 
@@ -292,6 +294,11 @@ pub(all) enum SyncSection {
   Palette
   Flags
   Screen
+} derive(Eq, @debug.Debug)
+
+pub(all) enum VideoBank {
+  Bank0
+  Bank1
 } derive(Eq, @debug.Debug)
 
 // Type aliases
