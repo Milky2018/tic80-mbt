@@ -22,7 +22,10 @@ pub fn boot() -> Unit {
   ignore(@tic80.key())
   ignore(@tic80.keyp())
   @tic80.line(0.0, 0.0, 0.0, 0.0, 0)
-  @tic80.map(w=0, h=0)
+  let map_remap : FuncRef[
+    (@tic80.MapRemapResult, Int, Int) -> @tic80.MapRemapResult,
+  ] = fn(tile, _x, _y) { tile }
+  @tic80.map(w=1, h=1, remap=map_remap)
   @tic80.memcpy(0, 0, 0)
   @tic80.memset(0, 0, 0)
   let tile = @tic80.mget(0, 0)

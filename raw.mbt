@@ -98,8 +98,19 @@ pub fn line(
 ) -> Unit = "env" "line"
 
 ///|
-/// `map_data_addr` is zero for no remap callback. A non-zero value points to
-/// three consecutive i32 fields: table index, user data, and result address.
+/// The current tile state passed to a map remap callback, and the replacement
+/// state returned by it.
+#valtype
+pub(all) struct MapRemapResult {
+  tile_id : Int
+  flip : Int
+  rotate : Int
+} derive(Debug, Eq)
+
+///|
+/// Draws a map region. When present, `remap` receives the current tile state
+/// and its map coordinates, and returns the state to draw. The callback must be
+/// capture-free because it is stored as a WebAssembly function reference.
 pub fn map(
   x? : Int = -1,
   y? : Int = -1,
@@ -107,11 +118,101 @@ pub fn map(
   h? : Int = -1,
   sx? : Int = 0,
   sy? : Int = 0,
-  transparent_colors_addr? : Int = 0,
-  color_count? : Int = 0,
+  transparent_colors? : Bytes = b"",
   scale? : Int = -1,
-  map_data_addr? : Int = 0,
+  remap? : FuncRef[(MapRemapResult, Int, Int) -> MapRemapResult],
+) -> Unit {
+  let map_data = match remap {
+    None => None
+    Some(remap) =>
+      Some({
+        trampoline: map_remap_trampoline_ref,
+        remap,
+        result_buffer: FixedArray::make(12, b'\x00'),
+      })
+  }
+  host_map(
+    x,
+    y,
+    w,
+    h,
+    sx,
+    sy,
+    transparent_colors,
+    transparent_colors.length(),
+    scale,
+    map_data,
+  )
+}
+
+///|
+/// The field order is the TIC-80 `MapData` ABI: trampoline table index, user
+/// data, and result address. The remap function's table index doubles as the
+/// user data consumed by `map_remap_trampoline_ref`.
+priv struct MapData {
+  trampoline : FuncRef[
+    (
+      FuncRef[(MapRemapResult, Int, Int) -> MapRemapResult],
+      Int,
+      Int,
+      FixedArray[Byte],
+    ) -> Unit,
+  ]
+  remap : FuncRef[(MapRemapResult, Int, Int) -> MapRemapResult]
+  result_buffer : FixedArray[Byte]
+}
+
+///|
+let map_remap_trampoline_ref : FuncRef[
+  (
+    FuncRef[(MapRemapResult, Int, Int) -> MapRemapResult],
+    Int,
+    Int,
+    FixedArray[Byte],
+  ) -> Unit,
+] = fn(remap, x, y, result_buffer) {
+  let current : MapRemapResult = {
+    tile_id: result_buffer[0].to_int(),
+    flip: decode_i32_le(result_buffer, 4),
+    rotate: decode_i32_le(result_buffer, 8),
+  }
+  let replacement = remap(current, x, y)
+  result_buffer[0] = replacement.tile_id.to_byte()
+  encode_i32_le(result_buffer, 4, replacement.flip)
+  encode_i32_le(result_buffer, 8, replacement.rotate)
+}
+
+///|
+#unsafe_skip_stub_check
+#borrow(transparent_colors, map_data)
+fn host_map(
+  x : Int,
+  y : Int,
+  w : Int,
+  h : Int,
+  sx : Int,
+  sy : Int,
+  transparent_colors : Bytes,
+  color_count : Int,
+  scale : Int,
+  map_data : MapData?,
 ) -> Unit = "env" "map"
+
+///|
+fn decode_i32_le(buffer : FixedArray[Byte], offset : Int) -> Int {
+  buffer[offset].to_int() |
+  (buffer[offset + 1].to_int() << 8) |
+  (buffer[offset + 2].to_int() << 16) |
+  (buffer[offset + 3].to_int() << 24)
+}
+
+///|
+fn encode_i32_le(buffer : FixedArray[Byte], offset : Int, value : Int) -> Unit {
+  buffer[offset] = value.to_byte()
+  buffer[offset + 1] = (value >> 8).to_byte()
+  buffer[offset + 2] = (value >> 16).to_byte()
+  buffer[offset + 3] = (value >> 24).to_byte()
+}
 
 ///|
 pub fn memcpy(dest : Int, src : Int, length : Int) -> Unit = "env" "memcpy"

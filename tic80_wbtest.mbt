@@ -18,3 +18,26 @@ test "decode mouse state" {
   }
   assert_eq(decode_mouse_state(buffer), expected)
 }
+
+///|
+test "map remap trampoline" {
+  let buffer : FixedArray[Byte] = [
+    b'\x07', b'\x00', b'\x00', b'\x00', b'\x02', b'\x00', b'\x00', b'\x00', b'\xfd',
+    b'\xff', b'\xff', b'\xff',
+  ]
+  let remap : FuncRef[(MapRemapResult, Int, Int) -> MapRemapResult] = fn(
+    current,
+    x,
+    y,
+  ) {
+    {
+      tile_id: current.tile_id + x,
+      flip: current.flip + y,
+      rotate: -current.rotate,
+    }
+  }
+  map_remap_trampoline_ref(remap, 4, 3, buffer)
+  assert_eq(buffer[0], b'\x0b')
+  assert_eq(decode_i32_le(buffer, 4), 5)
+  assert_eq(decode_i32_le(buffer, 8), 3)
+}

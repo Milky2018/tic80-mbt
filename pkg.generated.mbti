@@ -36,7 +36,7 @@ pub fn keyp(keycode? : Int, hold? : Int, period? : Int) -> Bool
 
 pub fn line(Float, Float, Float, Float, Int) -> Unit
 
-pub fn map(x? : Int, y? : Int, w? : Int, h? : Int, sx? : Int, sy? : Int, transparent_colors_addr? : Int, color_count? : Int, scale? : Int, map_data_addr? : Int) -> Unit
+pub fn map(x? : Int, y? : Int, w? : Int, h? : Int, sx? : Int, sy? : Int, transparent_colors? : Bytes, scale? : Int, remap? : FuncRef[(MapRemapResult, Int, Int) -> MapRemapResult]) -> Unit
 
 pub fn memcpy(Int, Int, Int) -> Unit
 
@@ -99,6 +99,12 @@ pub fn vbank(Int) -> Byte
 // Errors
 
 // Types and methods
+pub(all) struct MapRemapResult {
+  tile_id : Int
+  flip : Int
+  rotate : Int
+} derive(Eq, @debug.Debug)
+
 pub(all) struct MouseState {
   x : Int
   y : Int
