@@ -40,12 +40,12 @@ This configuration has four responsibilities:
   TIC-80 copies VRAM, tiles, sprites, map data, input state, audio state, and
   the rest of its runtime RAM into this region before calling the cartridge.
 
-These settings belong to each cartridge package, such as `examples/hello`,
-rather than to the reusable `Milky2018/tic80` API package itself. Build the
-cartridge with the WebAssembly backend, for example:
+These settings belong to each cartridge package rather than to the reusable
+`Milky2018/tic80` API package itself. Build the cartridge with the WebAssembly
+backend, for example:
 
 ```bash
-moon build --target wasm --release examples/hello
+moon build --target wasm --release path/to/cartridge
 ```
 
 ## Video banks

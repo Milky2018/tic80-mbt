@@ -1,0 +1,106 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Milky2018/tic80/raw"
+
+// Values
+pub fn raw_btn(Int) -> Int
+
+pub fn raw_btnp(Int, Int, Int) -> Int
+
+pub fn raw_circ(Int, Int, Int, Int) -> Unit
+
+pub fn raw_circb(Int, Int, Int, Int) -> Unit
+
+pub fn raw_clip(Int, Int, Int, Int) -> Unit
+
+pub fn raw_cls(Int) -> Unit
+
+pub fn raw_elli(Int, Int, Int, Int, Int) -> Unit
+
+pub fn raw_ellib(Int, Int, Int, Int, Int) -> Unit
+
+pub fn raw_exit() -> Unit
+
+pub fn raw_fget(Int, Int) -> Int
+
+pub fn raw_font(Bytes, Int, Int, Bytes, Int, Int, Int, Bool, Int, Bool) -> Int
+
+pub fn raw_fset(Int, Int, Bool) -> Unit
+
+pub fn raw_key(Int) -> Int
+
+pub fn raw_keyp(Int, Int, Int) -> Int
+
+pub fn raw_line(Float, Float, Float, Float, Int) -> Unit
+
+pub fn raw_map(Int, Int, Int, Int, Int, Int, Bytes, Int, Int, MapData?) -> Unit
+
+pub fn raw_memcpy(Int, Int, Int) -> Unit
+
+pub fn raw_memset(Int, Byte, Int) -> Unit
+
+pub fn raw_mget(Int, Int) -> Int
+
+pub fn raw_mouse(FixedArray[Byte]) -> Unit
+
+pub fn raw_mset(Int, Int, Int) -> Unit
+
+pub fn raw_music(Int, Int, Int, Bool, Bool, Int, Int) -> Unit
+
+pub fn raw_peek(Int, Int) -> Byte
+
+pub fn raw_peek1(Int) -> Byte
+
+pub fn raw_peek2(Int) -> Byte
+
+pub fn raw_peek4(Int) -> Byte
+
+pub fn raw_pix(Int, Int, Int) -> Byte
+
+pub fn raw_pmem(Int, Int64) -> UInt
+
+pub fn raw_poke(Int, Int, Int) -> Unit
+
+pub fn raw_poke1(Int, Int) -> Unit
+
+pub fn raw_poke2(Int, Int) -> Unit
+
+pub fn raw_poke4(Int, Int) -> Unit
+
+pub fn raw_print(Bytes, Int, Int, Int, Bool, Int, Bool) -> Int
+
+pub fn raw_rect(Int, Int, Int, Int, Int) -> Unit
+
+pub fn raw_rectb(Int, Int, Int, Int, Int) -> Unit
+
+pub fn raw_sfx(Int, Int, Int, Int, Int, Int, Int, Int) -> Unit
+
+pub fn raw_spr(Int, Int, Int, Bytes, Int, Int, Int, Int, Int, Int) -> Unit
+
+pub fn raw_sync(Int, Int, Bool) -> Unit
+
+pub fn raw_time() -> Float
+
+pub fn raw_trace(Bytes, Int) -> Unit
+
+pub fn raw_tri(Float, Float, Float, Float, Float, Float, Int) -> Unit
+
+pub fn raw_trib(Float, Float, Float, Float, Float, Float, Int) -> Unit
+
+pub fn raw_tstamp() -> UInt
+
+pub fn raw_ttri(Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Int, Bytes, Int, Float, Float, Float, Bool) -> Unit
+
+pub fn raw_vbank(Int) -> Byte
+
+// Errors
+
+// Types and methods
+pub(all) struct MapData {
+  trampoline : FuncRef[(Int, Int, Int, FixedArray[Byte]) -> Unit]
+  user_data : Int
+  result_buffer : FixedArray[Byte]
+}
+
+// Type aliases
+
+// Traits

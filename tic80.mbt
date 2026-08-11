@@ -1,8 +1,4 @@
-// TIC-80 WebAssembly API wrappers.
-//
-// The signatures mirror `linkTicAPI` from TIC-80 commit
-// `4aba09c98f1e5028b82765be1647677b08d35942`.
-// Remaining address arguments are byte offsets in the imported linear memory.
+// High-level MoonBit wrappers for the TIC-80 WebAssembly API.
 
 ///|
 /// A button on one of the four TIC-80 gamepads.
@@ -49,13 +45,13 @@ fn Button::to_int(self : Button) -> Int = "%identity"
 ///|
 /// Returns whether the selected gamepad button is currently held.
 pub fn btn(button : Button) -> Bool {
-  raw_btn(button.to_int()) != 0
+  @raw.raw_btn(button.to_int()) != 0
 }
 
 ///|
 /// Returns whether any button on any gamepad is currently held.
 pub fn any_btn() -> Bool {
-  raw_btn(-1) != 0
+  @raw.raw_btn(-1) != 0
 }
 
 ///|
@@ -68,7 +64,7 @@ pub struct ButtonState {
 ///|
 /// Captures all four gamepads in one host call.
 pub fn button_state() -> ButtonState {
-  { bits: raw_btn(-1).reinterpret_as_uint() }
+  { bits: @raw.raw_btn(-1).reinterpret_as_uint() }
 }
 
 ///|
@@ -84,56 +80,59 @@ pub fn ButtonState::any(self : ButtonState) -> Bool {
 }
 
 ///|
-fn raw_btn(id : Int) -> Int = "env" "btn"
-
-///|
 /// Returns whether a button was newly pressed.
 pub fn btnp(button : Button, hold? : Int = -1, period? : Int = -1) -> Bool {
-  raw_btnp(button.to_int(), hold, period) != 0
+  @raw.raw_btnp(button.to_int(), hold, period) != 0
 }
 
 ///|
 /// Returns whether any button was newly pressed.
 pub fn any_btnp() -> Bool {
-  raw_btnp(-1, -1, -1) != 0
+  @raw.raw_btnp(-1, -1, -1) != 0
 }
-
-///|
-fn raw_btnp(id : Int, hold : Int, period : Int) -> Int = "env" "btnp"
 
 ///|
 /// Sets the screen clipping rectangle.
 pub fn clip(x : Int, y : Int, w : Int, h : Int) -> Unit {
-  raw_clip(x, y, w, h)
+  @raw.raw_clip(x, y, w, h)
 }
 
 ///|
 /// Restores the clipping rectangle to the full screen.
 pub fn clip_reset() -> Unit {
-  raw_clip(-1, -1, -1, -1)
+  @raw.raw_clip(-1, -1, -1, -1)
 }
 
 ///|
-fn raw_clip(x : Int, y : Int, w : Int, h : Int) -> Unit = "env" "clip"
-
-///|
 /// Clears the screen with a color.
-pub fn cls(color? : Int = 0) -> Unit = "env" "cls"
+pub fn cls(color? : Int = 0) -> Unit {
+  @raw.raw_cls(color)
+}
 
 ///|
-pub fn circ(x : Int, y : Int, radius : Int, color : Int) -> Unit = "env" "circ"
+pub fn circ(x : Int, y : Int, radius : Int, color : Int) -> Unit {
+  @raw.raw_circ(x, y, radius, color)
+}
 
 ///|
-pub fn circb(x : Int, y : Int, radius : Int, color : Int) -> Unit = "env" "circb"
+pub fn circb(x : Int, y : Int, radius : Int, color : Int) -> Unit {
+  @raw.raw_circb(x, y, radius, color)
+}
 
 ///|
-pub fn elli(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit = "env" "elli"
+pub fn elli(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit {
+  @raw.raw_elli(x, y, a, b, color)
+}
 
 ///|
-pub fn ellib(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit = "env" "ellib"
+pub fn ellib(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit {
+  @raw.raw_ellib(x, y, a, b, color)
+}
 
 ///|
-pub fn exit() -> Unit = "env" "exit"
+pub fn exit() -> Unit {
+  @raw.raw_exit()
+}
 
 ///|
 /// Returns whether one of a sprite's eight user-defined flags is set.
@@ -143,7 +142,7 @@ pub fn exit() -> Unit = "env" "exit"
 /// outside its valid range.
 pub fn fget(sprite_id : Int, flag : Int) -> Bool {
   check_sprite_flag_args(sprite_id, flag)
-  raw_fget(sprite_id, flag) != 0
+  @raw.raw_fget(sprite_id, flag) != 0
 }
 
 ///|
@@ -155,7 +154,7 @@ pub fn fget(sprite_id : Int, flag : Int) -> Bool {
 /// Panics when either argument is outside its valid range.
 pub fn fset(sprite_id : Int, flag : Int, value : Bool) -> Unit {
   check_sprite_flag_args(sprite_id, flag)
-  raw_fset(sprite_id, flag, value)
+  @raw.raw_fset(sprite_id, flag, value)
 }
 
 ///|
@@ -167,12 +166,6 @@ fn check_sprite_flag_args(sprite_id : Int, flag : Int) -> Unit {
     abort("sprite flag must be between 0 and 7")
   }
 }
-
-///|
-fn raw_fget(sprite_id : Int, flag : Int) -> Int = "env" "fget"
-
-///|
-fn raw_fset(sprite_id : Int, flag : Int, value : Bool) -> Unit = "env" "fset"
 
 ///|
 /// Draws ASCII text with a custom raster font. Panics if `text` contains a
@@ -189,7 +182,7 @@ pub fn font(
   scale? : Int = -1,
   alt? : Bool = false,
 ) -> Int {
-  host_font(
+  @raw.raw_font(
     encode_c_text(text),
     x,
     y,
@@ -202,22 +195,6 @@ pub fn font(
     alt,
   )
 }
-
-///|
-#unsafe_skip_stub_check
-#borrow(text, transparent_colors)
-fn host_font(
-  text : Bytes,
-  x : Int,
-  y : Int,
-  transparent_colors : Bytes,
-  color_count : Int,
-  char_width : Int,
-  char_height : Int,
-  fixed : Bool,
-  scale : Int,
-  alt : Bool,
-) -> Int = "env" "font"
 
 ///|
 /// A TIC-80 keyboard key.
@@ -326,32 +303,26 @@ fn Key::to_int(self : Key) -> Int = "%identity"
 ///|
 /// Returns whether the selected keyboard key is currently held.
 pub fn key(key : Key) -> Bool {
-  raw_key(key.to_int()) != 0
+  @raw.raw_key(key.to_int()) != 0
 }
 
 ///|
 /// Returns whether any keyboard key is currently held.
 pub fn any_key() -> Bool {
-  raw_key(-1) != 0
+  @raw.raw_key(-1) != 0
 }
-
-///|
-fn raw_key(keycode : Int) -> Int = "env" "key"
 
 ///|
 /// Returns whether a key was newly pressed or repeated.
 pub fn keyp(key : Key, hold? : Int = -1, period? : Int = -1) -> Bool {
-  raw_keyp(key.to_int(), hold, period) != 0
+  @raw.raw_keyp(key.to_int(), hold, period) != 0
 }
 
 ///|
 /// Returns whether any keyboard key was newly pressed.
 pub fn any_keyp() -> Bool {
-  raw_keyp(-1, -1, -1) != 0
+  @raw.raw_keyp(-1, -1, -1) != 0
 }
-
-///|
-fn raw_keyp(keycode : Int, hold : Int, period : Int) -> Int = "env" "keyp"
 
 ///|
 pub fn line(
@@ -360,7 +331,9 @@ pub fn line(
   x1 : Float,
   y1 : Float,
   color : Int,
-) -> Unit = "env" "line"
+) -> Unit {
+  @raw.raw_line(x0, y0, x1, y1, color)
+}
 
 ///|
 /// A sprite or map tile flip applied by TIC-80.
@@ -411,16 +384,16 @@ pub fn map(
   scale? : Int = -1,
   remap? : FuncRef[(MapRemapResult, Int, Int) -> MapRemapResult],
 ) -> Unit {
-  let map_data = match remap {
+  let map_data : @raw.MapData? = match remap {
     None => None
     Some(remap) =>
       Some({
         trampoline: map_remap_trampoline_ref,
-        remap,
+        user_data: map_remap_to_int(remap),
         result_buffer: FixedArray::make(12, b'\x00'),
       })
   }
-  host_map(
+  @raw.raw_map(
     x,
     y,
     w,
@@ -435,41 +408,29 @@ pub fn map(
 }
 
 ///|
-/// The field order is the TIC-80 `MapData` ABI: trampoline table index, user
-/// data, and result address. The remap function's table index doubles as the
-/// user data consumed by `map_remap_trampoline_ref`.
-priv struct MapData {
-  trampoline : FuncRef[
-    (
-      FuncRef[(MapRemapResult, Int, Int) -> MapRemapResult],
-      Int,
-      Int,
-      FixedArray[Byte],
-    ) -> Unit,
-  ]
-  remap : FuncRef[(MapRemapResult, Int, Int) -> MapRemapResult]
-  result_buffer : FixedArray[Byte]
-}
-
-///|
 let map_remap_trampoline_ref : FuncRef[
-  (
-    FuncRef[(MapRemapResult, Int, Int) -> MapRemapResult],
-    Int,
-    Int,
-    FixedArray[Byte],
-  ) -> Unit,
+  (Int, Int, Int, FixedArray[Byte]) -> Unit,
 ] = fn(remap, x, y, result_buffer) {
   let current : MapRemapResult = {
     tile_id: result_buffer[0].to_int(),
     flip: decode_flip(decode_i32_le(result_buffer, 4)),
     rotate: decode_rotation(decode_i32_le(result_buffer, 8)),
   }
-  let replacement = remap(current, x, y)
+  let replacement = map_remap_from_int(remap)(current, x, y)
   result_buffer[0] = replacement.tile_id.to_byte()
   encode_i32_le(result_buffer, 4, replacement.flip.to_int())
   encode_i32_le(result_buffer, 8, replacement.rotate.to_int())
 }
+
+///|
+fn map_remap_to_int(
+  remap : FuncRef[(MapRemapResult, Int, Int) -> MapRemapResult],
+) -> Int = "%identity"
+
+///|
+fn map_remap_from_int(
+  remap : Int,
+) -> FuncRef[(MapRemapResult, Int, Int) -> MapRemapResult] = "%identity"
 
 ///|
 fn decode_flip(value : Int) -> Flip {
@@ -490,22 +451,6 @@ fn decode_rotation(value : Int) -> Rotation {
     _ => Clockwise270
   }
 }
-
-///|
-#unsafe_skip_stub_check
-#borrow(transparent_colors, map_data)
-fn host_map(
-  x : Int,
-  y : Int,
-  w : Int,
-  h : Int,
-  sx : Int,
-  sy : Int,
-  transparent_colors : Bytes,
-  color_count : Int,
-  scale : Int,
-  map_data : MapData?,
-) -> Unit = "env" "map"
 
 ///|
 fn decode_i32_le(buffer : FixedArray[Byte], offset : Int) -> Int {
@@ -529,7 +474,9 @@ fn encode_i32_le(buffer : FixedArray[Byte], offset : Int, value : Int) -> Unit {
 /// `dest` and `src` are byte addresses. The source and destination ranges may
 /// overlap. A negative length or a range outside TIC-80 RAM is ignored. This
 /// function does not copy MoonBit heap objects or `Bytes` values.
-pub fn memcpy(dest : Int, src : Int, length : Int) -> Unit = "env" "memcpy"
+pub fn memcpy(dest : Int, src : Int, length : Int) -> Unit {
+  @raw.raw_memcpy(dest, src, length)
+}
 
 ///|
 /// Fills `length` bytes of TIC-80 RAM with `value`.
@@ -537,13 +484,19 @@ pub fn memcpy(dest : Int, src : Int, length : Int) -> Unit = "env" "memcpy"
 /// `address` is a byte address. A negative length or a range outside TIC-80 RAM
 /// is ignored. This function does not operate on MoonBit heap objects or
 /// `Bytes` values.
-pub fn memset(address : Int, value : Byte, length : Int) -> Unit = "env" "memset"
+pub fn memset(address : Int, value : Byte, length : Int) -> Unit {
+  @raw.raw_memset(address, value, length)
+}
 
 ///|
-pub fn mget(x : Int, y : Int) -> Int = "env" "mget"
+pub fn mget(x : Int, y : Int) -> Int {
+  @raw.raw_mget(x, y)
+}
 
 ///|
-pub fn mset(x : Int, y : Int, tile_id : Int) -> Unit = "env" "mset"
+pub fn mset(x : Int, y : Int, tile_id : Int) -> Unit {
+  @raw.raw_mset(x, y, tile_id)
+}
 
 ///|
 pub(all) struct MouseState {
@@ -560,14 +513,9 @@ pub(all) struct MouseState {
 /// Returns an independent snapshot of the current mouse state.
 pub fn mouse() -> MouseState {
   let buffer = FixedArray::make(9, b'\x00')
-  host_mouse(buffer)
+  @raw.raw_mouse(buffer)
   decode_mouse_state(buffer)
 }
-
-///|
-#unsafe_skip_stub_check
-#borrow(buffer)
-fn host_mouse(buffer : FixedArray[Byte]) -> Unit = "env" "mouse"
 
 ///|
 fn decode_mouse_state(buffer : FixedArray[Byte]) -> MouseState {
@@ -621,7 +569,7 @@ pub fn music(
   speed? : Int = -1,
 ) -> Unit {
   check_music_track(track)
-  raw_music(track, frame, row, loop_, sustain, tempo, speed)
+  @raw.raw_music(track, frame, row, loop_, sustain, tempo, speed)
 }
 
 ///|
@@ -636,34 +584,20 @@ fn check_music_track(track : Int) -> Unit {
 ///
 /// This does not stop sound effects started independently with `sfx`.
 pub fn music_stop() -> Unit {
-  raw_music(-1, -1, -1, false, false, -1, -1)
+  @raw.raw_music(-1, -1, -1, false, false, -1, -1)
 }
-
-///|
-fn raw_music(
-  track : Int,
-  frame : Int,
-  row : Int,
-  loop_ : Bool,
-  sustain : Bool,
-  tempo : Int,
-  speed : Int,
-) -> Unit = "env" "music"
 
 ///|
 /// Returns the color of a pixel.
 pub fn pix(x : Int, y : Int) -> Byte {
-  raw_pix(x, y, -1)
+  @raw.raw_pix(x, y, -1)
 }
 
 ///|
 /// Draws a pixel.
 pub fn pix_set(x : Int, y : Int, color : Int) -> Unit {
-  ignore(raw_pix(x, y, color))
+  ignore(@raw.raw_pix(x, y, color))
 }
-
-///|
-fn raw_pix(x : Int, y : Int, color : Int) -> Byte = "env" "pix"
 
 ///|
 /// Reads one byte from TIC-80 RAM at the byte address `address`.
@@ -671,7 +605,7 @@ fn raw_pix(x : Int, y : Int, color : Int) -> Byte = "env" "pix"
 /// Returns zero when `address` is outside TIC-80 RAM. Use `peek4`, `peek2`, or
 /// `peek1` when the address is expressed in narrower units.
 pub fn peek(address : Int) -> Byte {
-  raw_peek(address, 8)
+  @raw.raw_peek(address, 8)
 }
 
 ///|
@@ -680,7 +614,9 @@ pub fn peek(address : Int) -> Byte {
 /// `address` is a nibble index rather than a byte address. Addresses `2 * n`
 /// and `2 * n + 1` select the low and high nibbles of byte `n`, respectively.
 /// Returns zero when the address is outside TIC-80 RAM.
-pub fn peek4(address : Int) -> Byte = "env" "peek4"
+pub fn peek4(address : Int) -> Byte {
+  @raw.raw_peek4(address)
+}
 
 ///|
 /// Reads one two-bit value from TIC-80 RAM.
@@ -688,7 +624,9 @@ pub fn peek4(address : Int) -> Byte = "env" "peek4"
 /// `address` is a two-bit-field index. Addresses `4 * n` through `4 * n + 3`
 /// select the four fields of byte `n` from least to most significant. Returns
 /// zero when the address is outside TIC-80 RAM.
-pub fn peek2(address : Int) -> Byte = "env" "peek2"
+pub fn peek2(address : Int) -> Byte {
+  @raw.raw_peek2(address)
+}
 
 ///|
 /// Reads one bit from TIC-80 RAM.
@@ -696,10 +634,9 @@ pub fn peek2(address : Int) -> Byte = "env" "peek2"
 /// `address` is a bit index. Addresses `8 * n` through `8 * n + 7` select the
 /// bits of byte `n` from least to most significant. Returns zero when the
 /// address is outside TIC-80 RAM.
-pub fn peek1(address : Int) -> Byte = "env" "peek1"
-
-///|
-fn raw_peek(address : Int, bits : Int) -> Byte = "env" "peek"
+pub fn peek1(address : Int) -> Byte {
+  @raw.raw_peek1(address)
+}
 
 ///|
 /// Reads a value from a persistent-memory slot.
@@ -707,7 +644,7 @@ fn raw_peek(address : Int, bits : Int) -> Byte = "env" "peek"
 /// `index` ranges from 0 through 255. Panics when it is outside that range.
 pub fn pmem(index : Int) -> UInt {
   check_pmem_index(index)
-  raw_pmem(index, -1L)
+  @raw.raw_pmem(index, -1L)
 }
 
 ///|
@@ -716,7 +653,7 @@ pub fn pmem(index : Int) -> UInt {
 /// `index` ranges from 0 through 255. Panics when it is outside that range.
 pub fn pmem_set(index : Int, value : UInt) -> UInt {
   check_pmem_index(index)
-  raw_pmem(index, value.to_int64())
+  @raw.raw_pmem(index, value.to_int64())
 }
 
 ///|
@@ -727,15 +664,12 @@ fn check_pmem_index(index : Int) -> Unit {
 }
 
 ///|
-fn raw_pmem(index : Int, value : Int64) -> UInt = "env" "pmem"
-
-///|
 /// Writes one byte to TIC-80 RAM at the byte address `address`.
 ///
 /// Writes outside TIC-80 RAM are ignored. Use `poke4`, `poke2`, or `poke1`
 /// when the address is expressed in narrower units.
 pub fn poke(address : Int, value : Byte) -> Unit {
-  raw_poke(address, value.to_int(), 8)
+  @raw.raw_poke(address, value.to_int(), 8)
 }
 
 ///|
@@ -744,7 +678,7 @@ pub fn poke(address : Int, value : Byte) -> Unit {
 /// `address` uses the nibble indexing described by `peek4`; only the low four
 /// bits of `value` are stored. Writes outside TIC-80 RAM are ignored.
 pub fn poke4(address : Int, value : Byte) -> Unit {
-  raw_poke4(address, value.to_int())
+  @raw.raw_poke4(address, value.to_int())
 }
 
 ///|
@@ -753,7 +687,7 @@ pub fn poke4(address : Int, value : Byte) -> Unit {
 /// `address` uses the two-bit-field indexing described by `peek2`; only the
 /// low two bits of `value` are stored. Writes outside TIC-80 RAM are ignored.
 pub fn poke2(address : Int, value : Byte) -> Unit {
-  raw_poke2(address, value.to_int())
+  @raw.raw_poke2(address, value.to_int())
 }
 
 ///|
@@ -762,20 +696,8 @@ pub fn poke2(address : Int, value : Byte) -> Unit {
 /// `address` uses the bit indexing described by `peek1`; only the lowest bit
 /// of `value` is stored. Writes outside TIC-80 RAM are ignored.
 pub fn poke1(address : Int, value : Byte) -> Unit {
-  raw_poke1(address, value.to_int())
+  @raw.raw_poke1(address, value.to_int())
 }
-
-///|
-fn raw_poke(address : Int, value : Int, bits : Int) -> Unit = "env" "poke"
-
-///|
-fn raw_poke4(address : Int, value : Int) -> Unit = "env" "poke4"
-
-///|
-fn raw_poke2(address : Int, value : Int) -> Unit = "env" "poke2"
-
-///|
-fn raw_poke1(address : Int, value : Int) -> Unit = "env" "poke1"
 
 ///|
 /// Draws ASCII text and returns its width. Panics if `text` contains a
@@ -789,27 +711,18 @@ pub fn print(
   scale? : Int = 1,
   small_font? : Bool = false,
 ) -> Int {
-  host_print(encode_c_text(text), x, y, color, fixed, scale, small_font)
+  @raw.raw_print(encode_c_text(text), x, y, color, fixed, scale, small_font)
 }
 
 ///|
-#unsafe_skip_stub_check
-#borrow(text)
-fn host_print(
-  text : Bytes,
-  x : Int,
-  y : Int,
-  color : Int,
-  fixed : Bool,
-  scale : Int,
-  small_font : Bool,
-) -> Int = "env" "print"
+pub fn rect(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit {
+  @raw.raw_rect(x, y, w, h, color)
+}
 
 ///|
-pub fn rect(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit = "env" "rect"
-
-///|
-pub fn rectb(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit = "env" "rectb"
+pub fn rectb(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit {
+  @raw.raw_rectb(x, y, w, h, color)
+}
 
 ///|
 /// One of TIC-80's four sound-effect channels.
@@ -857,7 +770,7 @@ pub fn sfx(
     None => 8
     Some(speed) => speed
   }
-  raw_sfx(
+  @raw.raw_sfx(
     id,
     raw_note,
     raw_octave,
@@ -874,7 +787,7 @@ pub fn sfx(
 ///
 /// This does not stop music playback or effects on the other channels.
 pub fn sfx_stop(channel? : SfxChannel = Channel0) -> Unit {
-  raw_sfx(-1, 0, 0, -1, channel.to_int(), 15, 15, 8)
+  @raw.raw_sfx(-1, 0, 0, -1, channel.to_int(), 15, 15, 8)
 }
 
 ///|
@@ -898,18 +811,6 @@ fn split_sfx_note(note : Int) -> (Int, Int) {
 }
 
 ///|
-fn raw_sfx(
-  id : Int,
-  note : Int,
-  octave : Int,
-  duration : Int,
-  channel : Int,
-  volume_left : Int,
-  volume_right : Int,
-  speed : Int,
-) -> Unit = "env" "sfx"
-
-///|
 /// Transparent colors are passed directly from `transparent_colors`.
 pub fn spr(
   id : Int,
@@ -922,7 +823,7 @@ pub fn spr(
   w? : Int = 1,
   h? : Int = 1,
 ) -> Unit {
-  host_spr(
+  @raw.raw_spr(
     id,
     x,
     y,
@@ -935,22 +836,6 @@ pub fn spr(
     h,
   )
 }
-
-///|
-#unsafe_skip_stub_check
-#borrow(transparent_colors)
-fn host_spr(
-  id : Int,
-  x : Int,
-  y : Int,
-  transparent_colors : Bytes,
-  color_count : Int,
-  scale : Int,
-  flip : Int,
-  rotate : Int,
-  w : Int,
-  h : Int,
-) -> Unit = "env" "spr"
 
 ///|
 pub(all) enum SyncSection {
@@ -977,7 +862,7 @@ pub fn sync(
   bank? : Int = 0,
   to_cart? : Bool = false,
 ) -> Unit {
-  raw_sync(encode_sync_mask(sections), bank, to_cart)
+  @raw.raw_sync(encode_sync_mask(sections), bank, to_cart)
 }
 
 ///|
@@ -986,25 +871,21 @@ fn encode_sync_mask(sections : ArrayView[SyncSection]) -> Int {
 }
 
 ///|
-fn raw_sync(mask : Int, bank : Int, to_cart : Bool) -> Unit = "env" "sync"
+pub fn time() -> Float {
+  @raw.raw_time()
+}
 
 ///|
-pub fn time() -> Float = "env" "time"
-
-///|
-pub fn tstamp() -> UInt = "env" "tstamp"
+pub fn tstamp() -> UInt {
+  @raw.raw_tstamp()
+}
 
 ///|
 /// Writes ASCII text to the console. Panics if `text` contains a non-ASCII
 /// code unit.
 pub fn trace(text : StringView, color? : Int = -1) -> Unit {
-  host_trace(encode_c_text(text), color)
+  @raw.raw_trace(encode_c_text(text), color)
 }
-
-///|
-#unsafe_skip_stub_check
-#borrow(text)
-fn host_trace(text : Bytes, color : Int) -> Unit = "env" "trace"
 
 ///|
 fn encode_c_text(text : StringView) -> Bytes {
@@ -1020,7 +901,9 @@ pub fn tri(
   x3 : Float,
   y3 : Float,
   color : Int,
-) -> Unit = "env" "tri"
+) -> Unit {
+  @raw.raw_tri(x1, y1, x2, y2, x3, y3, color)
+}
 
 ///|
 pub fn trib(
@@ -1031,7 +914,9 @@ pub fn trib(
   x3 : Float,
   y3 : Float,
   color : Int,
-) -> Unit = "env" "trib"
+) -> Unit {
+  @raw.raw_trib(x1, y1, x2, y2, x3, y3, color)
+}
 
 ///|
 /// The texture sampled by `ttri`.
@@ -1077,7 +962,7 @@ pub fn ttri(
   z3? : Float = 0.0,
   depth? : Bool = false,
 ) -> Unit {
-  host_ttri(
+  @raw.raw_ttri(
     x1,
     y1,
     x2,
@@ -1101,31 +986,6 @@ pub fn ttri(
 }
 
 ///|
-#unsafe_skip_stub_check
-#borrow(transparent_colors)
-fn host_ttri(
-  x1 : Float,
-  y1 : Float,
-  x2 : Float,
-  y2 : Float,
-  x3 : Float,
-  y3 : Float,
-  u1 : Float,
-  v1 : Float,
-  u2 : Float,
-  v2 : Float,
-  u3 : Float,
-  v3 : Float,
-  texture_source : Int,
-  transparent_colors : Bytes,
-  color_count : Int,
-  z1 : Float,
-  z2 : Float,
-  z3 : Float,
-  depth : Bool,
-) -> Unit = "env" "ttri"
-
-///|
 /// One of TIC-80's two 16 KiB video-memory banks.
 ///
 /// Drawing commands and direct VRAM access operate on the selected bank.
@@ -1146,7 +1006,7 @@ fn VideoBank::to_int(self : VideoBank) -> Int = "%identity"
 /// Use `vbank_set` when subsequent drawing or direct VRAM operations should
 /// target a different bank.
 pub fn vbank() -> VideoBank {
-  decode_video_bank(raw_vbank(-1))
+  decode_video_bank(@raw.raw_vbank(-1))
 }
 
 ///|
@@ -1158,7 +1018,7 @@ pub fn vbank() -> VideoBank {
 /// target. This only switches VRAM; it does not select a cartridge resource
 /// bank for `sync`.
 pub fn vbank_set(bank : VideoBank) -> VideoBank {
-  decode_video_bank(raw_vbank(bank.to_int()))
+  decode_video_bank(@raw.raw_vbank(bank.to_int()))
 }
 
 ///|
@@ -1169,6 +1029,3 @@ fn decode_video_bank(value : Byte) -> VideoBank {
     Bank1
   }
 }
-
-///|
-fn raw_vbank(bank : Int) -> Byte = "env" "vbank"
