@@ -614,16 +614,40 @@ pub fn pix_set(x : Int, y : Int, color : Int) -> Unit {
 fn raw_pix(x : Int, y : Int, color : Int) -> Byte = "env" "pix"
 
 ///|
-pub fn peek(address : Int, bits? : Int = 8) -> Byte = "env" "peek"
+/// Reads one byte from TIC-80 RAM at the byte address `address`.
+///
+/// Returns zero when `address` is outside TIC-80 RAM. Use `peek4`, `peek2`, or
+/// `peek1` when the address is expressed in narrower units.
+pub fn peek(address : Int) -> Byte {
+  raw_peek(address, 8)
+}
 
 ///|
+/// Reads one four-bit nibble from TIC-80 RAM.
+///
+/// `address` is a nibble index rather than a byte address. Addresses `2 * n`
+/// and `2 * n + 1` select the low and high nibbles of byte `n`, respectively.
+/// Returns zero when the address is outside TIC-80 RAM.
 pub fn peek4(address : Int) -> Byte = "env" "peek4"
 
 ///|
+/// Reads one two-bit value from TIC-80 RAM.
+///
+/// `address` is a two-bit-field index. Addresses `4 * n` through `4 * n + 3`
+/// select the four fields of byte `n` from least to most significant. Returns
+/// zero when the address is outside TIC-80 RAM.
 pub fn peek2(address : Int) -> Byte = "env" "peek2"
 
 ///|
+/// Reads one bit from TIC-80 RAM.
+///
+/// `address` is a bit index. Addresses `8 * n` through `8 * n + 7` select the
+/// bits of byte `n` from least to most significant. Returns zero when the
+/// address is outside TIC-80 RAM.
 pub fn peek1(address : Int) -> Byte = "env" "peek1"
+
+///|
+fn raw_peek(address : Int, bits : Int) -> Byte = "env" "peek"
 
 ///|
 /// Reads a value from a persistent-memory slot.
@@ -641,16 +665,52 @@ pub fn pmem_set(index : Int, value : UInt) -> UInt {
 fn raw_pmem(index : Int, value : Int64) -> UInt = "env" "pmem"
 
 ///|
-pub fn poke(address : Int, value : Int, bits? : Int = 8) -> Unit = "env" "poke"
+/// Writes one byte to TIC-80 RAM at the byte address `address`.
+///
+/// Writes outside TIC-80 RAM are ignored. Use `poke4`, `poke2`, or `poke1`
+/// when the address is expressed in narrower units.
+pub fn poke(address : Int, value : Byte) -> Unit {
+  raw_poke(address, value.to_int(), 8)
+}
 
 ///|
-pub fn poke4(address : Int, value : Int) -> Unit = "env" "poke4"
+/// Writes one four-bit nibble to TIC-80 RAM.
+///
+/// `address` uses the nibble indexing described by `peek4`; only the low four
+/// bits of `value` are stored. Writes outside TIC-80 RAM are ignored.
+pub fn poke4(address : Int, value : Byte) -> Unit {
+  raw_poke4(address, value.to_int())
+}
 
 ///|
-pub fn poke2(address : Int, value : Int) -> Unit = "env" "poke2"
+/// Writes one two-bit value to TIC-80 RAM.
+///
+/// `address` uses the two-bit-field indexing described by `peek2`; only the
+/// low two bits of `value` are stored. Writes outside TIC-80 RAM are ignored.
+pub fn poke2(address : Int, value : Byte) -> Unit {
+  raw_poke2(address, value.to_int())
+}
 
 ///|
-pub fn poke1(address : Int, value : Int) -> Unit = "env" "poke1"
+/// Writes one bit to TIC-80 RAM.
+///
+/// `address` uses the bit indexing described by `peek1`; only the lowest bit
+/// of `value` is stored. Writes outside TIC-80 RAM are ignored.
+pub fn poke1(address : Int, value : Byte) -> Unit {
+  raw_poke1(address, value.to_int())
+}
+
+///|
+fn raw_poke(address : Int, value : Int, bits : Int) -> Unit = "env" "poke"
+
+///|
+fn raw_poke4(address : Int, value : Int) -> Unit = "env" "poke4"
+
+///|
+fn raw_poke2(address : Int, value : Int) -> Unit = "env" "poke2"
+
+///|
+fn raw_poke1(address : Int, value : Int) -> Unit = "env" "poke1"
 
 ///|
 /// Draws ASCII text and returns its width. Panics if `text` contains a

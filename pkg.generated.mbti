@@ -64,7 +64,7 @@ pub fn music(Int, frame? : Int, row? : Int, loop_? : Bool, sustain? : Bool, temp
 
 pub fn music_stop() -> Unit
 
-pub fn peek(Int, bits? : Int) -> Byte
+pub fn peek(Int) -> Byte
 
 pub fn peek1(Int) -> Byte
 
@@ -80,13 +80,13 @@ pub fn pmem(Int) -> UInt
 
 pub fn pmem_set(Int, UInt) -> UInt
 
-pub fn poke(Int, Int, bits? : Int) -> Unit
+pub fn poke(Int, Byte) -> Unit
 
-pub fn poke1(Int, Int) -> Unit
+pub fn poke1(Int, Byte) -> Unit
 
-pub fn poke2(Int, Int) -> Unit
+pub fn poke2(Int, Byte) -> Unit
 
-pub fn poke4(Int, Int) -> Unit
+pub fn poke4(Int, Byte) -> Unit
 
 pub fn print(StringView, x? : Int, y? : Int, color? : Int, fixed? : Bool, scale? : Int, small_font? : Bool) -> Int
 
