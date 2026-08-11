@@ -39,10 +39,11 @@ pub fn fget(id : Int, flag : Int) -> Bool = "env" "fget"
 pub fn fset(id : Int, flag : Int, value : Bool) -> Unit = "env" "fset"
 
 ///|
-/// `text_addr` must point to a null-terminated string. Transparent colors are
-/// passed directly from `transparent_colors`.
+/// Draws ASCII text with a custom raster font. Panics if `text` contains a
+/// non-ASCII code unit. Transparent colors are passed directly from
+/// `transparent_colors`.
 pub fn font(
-  text_addr : Int,
+  text : StringView,
   x : Int,
   y : Int,
   transparent_colors? : Bytes = b"",
@@ -53,7 +54,7 @@ pub fn font(
   alt? : Bool = false,
 ) -> Int {
   host_font(
-    text_addr,
+    encode_c_text(text),
     x,
     y,
     transparent_colors,
@@ -68,9 +69,9 @@ pub fn font(
 
 ///|
 #unsafe_skip_stub_check
-#borrow(transparent_colors)
+#borrow(text, transparent_colors)
 fn host_font(
-  text_addr : Int,
+  text : Bytes,
   x : Int,
   y : Int,
   transparent_colors : Bytes,
@@ -328,15 +329,31 @@ pub fn poke2(address : Int, value : Int) -> Unit = "env" "poke2"
 pub fn poke1(address : Int, value : Int) -> Unit = "env" "poke1"
 
 ///|
-/// `text_addr` must point to a null-terminated string.
+/// Draws ASCII text and returns its width. Panics if `text` contains a
+/// non-ASCII code unit.
 pub fn print(
-  text_addr : Int,
-  x : Int,
-  y : Int,
+  text : StringView,
+  x? : Int = 0,
+  y? : Int = 0,
   color? : Int = 15,
   fixed? : Bool = false,
   scale? : Int = 1,
   small_font? : Bool = false,
+) -> Int {
+  host_print(encode_c_text(text), x, y, color, fixed, scale, small_font)
+}
+
+///|
+#unsafe_skip_stub_check
+#borrow(text)
+fn host_print(
+  text : Bytes,
+  x : Int,
+  y : Int,
+  color : Int,
+  fixed : Bool,
+  scale : Int,
+  small_font : Bool,
 ) -> Int = "env" "print"
 
 ///|
@@ -414,8 +431,21 @@ pub fn time() -> Float = "env" "time"
 pub fn tstamp() -> UInt = "env" "tstamp"
 
 ///|
-/// `text_addr` must point to a null-terminated string.
-pub fn trace(text_addr : Int, color? : Int = -1) -> Unit = "env" "trace"
+/// Writes ASCII text to the console. Panics if `text` contains a non-ASCII
+/// code unit.
+pub fn trace(text : StringView, color? : Int = -1) -> Unit {
+  host_trace(encode_c_text(text), color)
+}
+
+///|
+#unsafe_skip_stub_check
+#borrow(text)
+fn host_trace(text : Bytes, color : Int) -> Unit = "env" "trace"
+
+///|
+fn encode_c_text(text : StringView) -> Bytes {
+  @ascii.encode(text) + b"\x00"
+}
 
 ///|
 pub fn tri(

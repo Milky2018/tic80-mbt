@@ -26,7 +26,7 @@ pub fn exit() -> Unit
 
 pub fn fget(Int, Int) -> Bool
 
-pub fn font(Int, Int, Int, transparent_colors? : Bytes, char_width? : Int, char_height? : Int, fixed? : Bool, scale? : Int, alt? : Bool) -> Int
+pub fn font(StringView, Int, Int, transparent_colors? : Bytes, char_width? : Int, char_height? : Int, fixed? : Bool, scale? : Int, alt? : Bool) -> Int
 
 pub fn fset(Int, Int, Bool) -> Unit
 
@@ -70,7 +70,7 @@ pub fn poke2(Int, Int) -> Unit
 
 pub fn poke4(Int, Int) -> Unit
 
-pub fn print(Int, Int, Int, color? : Int, fixed? : Bool, scale? : Int, small_font? : Bool) -> Int
+pub fn print(StringView, x? : Int, y? : Int, color? : Int, fixed? : Bool, scale? : Int, small_font? : Bool) -> Int
 
 pub fn rect(Int, Int, Int, Int, Int) -> Unit
 
@@ -84,7 +84,7 @@ pub fn sync(mask? : Int, bank? : Int, to_cart? : Bool) -> Unit
 
 pub fn time() -> Float
 
-pub fn trace(Int, color? : Int) -> Unit
+pub fn trace(StringView, color? : Int) -> Unit
 
 pub fn tri(Float, Float, Float, Float, Float, Float, Int) -> Unit
 

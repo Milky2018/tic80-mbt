@@ -41,3 +41,8 @@ test "map remap trampoline" {
   assert_eq(decode_i32_le(buffer, 4), 5)
   assert_eq(decode_i32_le(buffer, 8), 3)
 }
+
+///|
+test "encode C text" {
+  assert_eq(encode_c_text("TIC\n80"), b"TIC\n80\x00")
+}
