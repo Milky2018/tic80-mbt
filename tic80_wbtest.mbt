@@ -262,3 +262,10 @@ test "video banks match the TIC-80 ABI" {
   assert_eq(decode_video_bank(b'\x00'), Bank0)
   assert_eq(decode_video_bank(b'\x01'), Bank1)
 }
+
+///|
+test "texture sources match the TIC-80 ABI" {
+  assert_eq(TileSheet.to_int(), 0)
+  assert_eq(TileMap.to_int(), 1)
+  assert_eq(OtherVideoBank.to_int(), 2)
+}

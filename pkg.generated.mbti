@@ -108,7 +108,7 @@ pub fn trib(Float, Float, Float, Float, Float, Float, Int) -> Unit
 
 pub fn tstamp() -> UInt
 
-pub fn ttri(Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, texture_source? : Int, transparent_colors? : Bytes, z1? : Float, z2? : Float, z3? : Float, depth? : Bool) -> Unit
+pub fn ttri(Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, texture_source? : TextureSource, transparent_colors? : Bytes, z1? : Float, z2? : Float, z3? : Float, depth? : Bool) -> Unit
 
 pub fn vbank() -> VideoBank
 
@@ -294,6 +294,12 @@ pub(all) enum SyncSection {
   Palette
   Flags
   Screen
+} derive(Eq, @debug.Debug)
+
+pub(all) enum TextureSource {
+  TileSheet
+  TileMap
+  OtherVideoBank
 } derive(Eq, @debug.Debug)
 
 pub(all) enum VideoBank {

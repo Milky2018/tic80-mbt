@@ -56,7 +56,21 @@ pub fn boot() -> Unit {
   @tic80.trace("")
   @tic80.tri(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0)
   @tic80.trib(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0)
-  @tic80.ttri(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+  @tic80.ttri(
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    texture_source=TileMap,
+  )
   let current_video_bank = @tic80.vbank()
   ignore(@tic80.vbank_set(current_video_bank))
   // Keep `exit` last so every other host import is exercised first.

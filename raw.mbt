@@ -795,6 +795,28 @@ pub fn trib(
 ) -> Unit = "env" "trib"
 
 ///|
+/// The texture sampled by `ttri`.
+///
+/// `TileSheet` samples image RAM through the active tile or sprite-sheet
+/// segment. `TileMap` samples map RAM and resolves its tile IDs through image
+/// RAM. `OtherVideoBank` samples the framebuffer of the video bank that is not
+/// currently selected by `vbank_set`.
+pub(all) enum TextureSource {
+  TileSheet = 0
+  TileMap = 1
+  OtherVideoBank = 2
+} derive(Debug, Eq)
+
+///|
+fn TextureSource::to_int(self : TextureSource) -> Int = "%identity"
+
+///|
+/// Draws a triangle textured from `texture_source`.
+///
+/// The `u` and `v` coordinates are interpreted in the coordinate space of the
+/// selected source. When `OtherVideoBank` is selected, `ttri` samples whichever
+/// video bank is not currently selected: it normally samples `Bank1` while
+/// drawing to `Bank0`, and samples `Bank0` while drawing to `Bank1`.
 /// Transparent colors are passed directly from `transparent_colors`.
 pub fn ttri(
   x1 : Float,
@@ -809,7 +831,7 @@ pub fn ttri(
   v2 : Float,
   u3 : Float,
   v3 : Float,
-  texture_source? : Int = 0,
+  texture_source? : TextureSource = TileSheet,
   transparent_colors? : Bytes = b"",
   z1? : Float = 0.0,
   z2? : Float = 0.0,
@@ -829,7 +851,7 @@ pub fn ttri(
     v2,
     u3,
     v3,
-    texture_source,
+    texture_source.to_int(),
     transparent_colors,
     transparent_colors.length(),
     z1,
