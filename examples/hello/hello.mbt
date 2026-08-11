@@ -50,7 +50,7 @@ pub fn boot() -> Unit {
   @tic80.rectb(0, 0, 0, 0, 0)
   @tic80.sfx(-1)
   @tic80.spr(0, 0, 0, flip=Horizontal, rotate=Clockwise90, w=0, h=0)
-  @tic80.sync(mask=0, bank=0, to_cart=false)
+  @tic80.sync(sections=[Tiles], bank=0, to_cart=false)
   ignore(@tic80.time())
   ignore(@tic80.tstamp())
   @tic80.trace("")

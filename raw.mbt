@@ -117,7 +117,8 @@ pub fn clip_reset() -> Unit {
 fn raw_clip(x : Int, y : Int, w : Int, h : Int) -> Unit = "env" "clip"
 
 ///|
-pub fn cls(color? : Int = -1) -> Unit = "env" "cls"
+/// Clears the screen with a color.
+pub fn cls(color? : Int = 0) -> Unit = "env" "cls"
 
 ///|
 pub fn circ(x : Int, y : Int, radius : Int, color : Int) -> Unit = "env" "circ"
@@ -713,11 +714,40 @@ fn host_spr(
 ) -> Unit = "env" "spr"
 
 ///|
+pub(all) enum SyncSection {
+  Tiles
+  Sprites
+  Map
+  Sfx
+  Music
+  Palette
+  Flags
+  Screen
+} derive(Debug, Eq)
+
+///|
+fn SyncSection::to_int(self : SyncSection) -> Int = "%identity"
+
+///|
+/// Synchronizes cartridge resources with runtime memory. An empty `sections`
+/// list selects every section. By default, data is copied from bank 0 into
+/// runtime memory; set `to_cart` to copy runtime data back to the bank. Each
+/// section can only be synchronized once per frame.
 pub fn sync(
-  mask? : Int = -1,
-  bank? : Int = -1,
+  sections? : ArrayView[SyncSection] = [],
+  bank? : Int = 0,
   to_cart? : Bool = false,
-) -> Unit = "env" "sync"
+) -> Unit {
+  raw_sync(encode_sync_mask(sections), bank, to_cart)
+}
+
+///|
+fn encode_sync_mask(sections : ArrayView[SyncSection]) -> Int {
+  sections.fold(init=0, (mask, section) => mask | (1 << section.to_int()))
+}
+
+///|
+fn raw_sync(mask : Int, bank : Int, to_cart : Bool) -> Unit = "env" "sync"
 
 ///|
 pub fn time() -> Float = "env" "time"

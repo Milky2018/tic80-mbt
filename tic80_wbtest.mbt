@@ -235,3 +235,22 @@ test "key codes match the TIC-80 ABI" {
     assert_eq(pair.0.to_int(), pair.1)
   }
 }
+
+///|
+test "sync sections match the TIC-80 ABI" {
+  let sections : Array[(SyncSection, Int)] = [
+    (Tiles, 0),
+    (Sprites, 1),
+    (Map, 2),
+    (Sfx, 3),
+    (Music, 4),
+    (Palette, 5),
+    (Flags, 6),
+    (Screen, 7),
+  ]
+  for section in sections {
+    assert_eq(section.0.to_int(), section.1)
+  }
+  assert_eq(encode_sync_mask([]), 0)
+  assert_eq(encode_sync_mask([Tiles, Map, Screen]), 0x85)
+}

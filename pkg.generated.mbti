@@ -96,7 +96,7 @@ pub fn sfx(Int, note? : Int, octave? : Int, duration? : Int, channel? : Int, vol
 
 pub fn spr(Int, Int, Int, transparent_colors? : Bytes, scale? : Int, flip? : Flip, rotate? : Rotation, w? : Int, h? : Int) -> Unit
 
-pub fn sync(mask? : Int, bank? : Int, to_cart? : Bool) -> Unit
+pub fn sync(sections? : ArrayView[SyncSection], bank? : Int, to_cart? : Bool) -> Unit
 
 pub fn time() -> Float
 
@@ -281,6 +281,17 @@ pub(all) enum Rotation {
   Clockwise90
   Clockwise180
   Clockwise270
+} derive(Eq, @debug.Debug)
+
+pub(all) enum SyncSection {
+  Tiles
+  Sprites
+  Map
+  Sfx
+  Music
+  Palette
+  Flags
+  Screen
 } derive(Eq, @debug.Debug)
 
 // Type aliases
