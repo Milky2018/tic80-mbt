@@ -174,10 +174,138 @@ fn host_font(
 ) -> Int = "env" "font"
 
 ///|
-pub fn key(keycode? : Int = -1) -> Bool = "env" "key"
+/// A TIC-80 keyboard key.
+///
+/// The explicit tags are the key codes expected by the TIC-80 host ABI.
+pub(all) enum Key {
+  A = 1
+  B = 2
+  C = 3
+  D = 4
+  E = 5
+  F = 6
+  G = 7
+  H = 8
+  I = 9
+  J = 10
+  K = 11
+  L = 12
+  M = 13
+  N = 14
+  O = 15
+  P = 16
+  Q = 17
+  R = 18
+  S = 19
+  T = 20
+  U = 21
+  V = 22
+  W = 23
+  X = 24
+  Y = 25
+  Z = 26
+  Digit0 = 27
+  Digit1 = 28
+  Digit2 = 29
+  Digit3 = 30
+  Digit4 = 31
+  Digit5 = 32
+  Digit6 = 33
+  Digit7 = 34
+  Digit8 = 35
+  Digit9 = 36
+  Minus = 37
+  Equals = 38
+  LeftBracket = 39
+  RightBracket = 40
+  Backslash = 41
+  Semicolon = 42
+  Apostrophe = 43
+  Grave = 44
+  Comma = 45
+  Period = 46
+  Slash = 47
+  Space = 48
+  Tab = 49
+  Return = 50
+  Backspace = 51
+  Delete = 52
+  Insert = 53
+  PageUp = 54
+  PageDown = 55
+  Home = 56
+  End = 57
+  Up = 58
+  Down = 59
+  Left = 60
+  Right = 61
+  CapsLock = 62
+  Ctrl = 63
+  Shift = 64
+  Alt = 65
+  Escape = 66
+  F1 = 67
+  F2 = 68
+  F3 = 69
+  F4 = 70
+  F5 = 71
+  F6 = 72
+  F7 = 73
+  F8 = 74
+  F9 = 75
+  F10 = 76
+  F11 = 77
+  F12 = 78
+  Numpad0 = 79
+  Numpad1 = 80
+  Numpad2 = 81
+  Numpad3 = 82
+  Numpad4 = 83
+  Numpad5 = 84
+  Numpad6 = 85
+  Numpad7 = 86
+  Numpad8 = 87
+  Numpad9 = 88
+  NumpadPlus = 89
+  NumpadMinus = 90
+  NumpadMultiply = 91
+  NumpadDivide = 92
+  NumpadEnter = 93
+  NumpadPeriod = 94
+} derive(Debug, Eq)
 
 ///|
-pub fn keyp(keycode? : Int = -1, hold? : Int = -1, period? : Int = -1) -> Bool = "env" "keyp"
+fn Key::to_int(self : Key) -> Int = "%identity"
+
+///|
+/// Returns whether the selected keyboard key is currently held.
+pub fn key(key : Key) -> Bool {
+  raw_key(key.to_int()) != 0
+}
+
+///|
+/// Returns whether any keyboard key is currently held.
+pub fn any_key() -> Bool {
+  raw_key(-1) != 0
+}
+
+///|
+fn raw_key(keycode : Int) -> Int = "env" "key"
+
+///|
+/// Returns whether a key was newly pressed or repeated.
+pub fn keyp(key : Key, hold? : Int = -1, period? : Int = -1) -> Bool {
+  raw_keyp(key.to_int(), hold, period) != 0
+}
+
+///|
+/// Returns whether any keyboard key was newly pressed.
+pub fn any_keyp() -> Bool {
+  raw_keyp(-1, -1, -1) != 0
+}
+
+///|
+fn raw_keyp(keycode : Int, hold : Int, period : Int) -> Int = "env" "keyp"
 
 ///|
 pub fn line(

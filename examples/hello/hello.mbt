@@ -17,8 +17,10 @@ pub fn boot() -> Unit {
   let sprite_flag = @tic80.fget(0, 0)
   @tic80.fset(0, 0, sprite_flag)
   ignore(@tic80.font("", 0, 0))
-  ignore(@tic80.key())
-  ignore(@tic80.keyp())
+  ignore(@tic80.key(A))
+  ignore(@tic80.any_key())
+  ignore(@tic80.keyp(A))
+  ignore(@tic80.any_keyp())
   @tic80.line(0.0, 0.0, 0.0, 0.0, 0)
   let map_remap : FuncRef[
     (@tic80.MapRemapResult, Int, Int) -> @tic80.MapRemapResult,

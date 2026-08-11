@@ -10,6 +10,10 @@ pub fn any_btn() -> Bool
 
 pub fn any_btnp() -> Bool
 
+pub fn any_key() -> Bool
+
+pub fn any_keyp() -> Bool
+
 pub fn btn(Button) -> Bool
 
 pub fn btnp(Button, hold? : Int, period? : Int) -> Bool
@@ -36,9 +40,9 @@ pub fn font(StringView, Int, Int, transparent_colors? : Bytes, char_width? : Int
 
 pub fn fset(Int, Int, Bool) -> Unit
 
-pub fn key(keycode? : Int) -> Bool
+pub fn key(Key) -> Bool
 
-pub fn keyp(keycode? : Int, hold? : Int, period? : Int) -> Bool
+pub fn keyp(Key, hold? : Int, period? : Int) -> Bool
 
 pub fn line(Float, Float, Float, Float, Int) -> Unit
 
@@ -145,6 +149,103 @@ pub struct ButtonState {
 } derive(Eq, @debug.Debug)
 pub fn ButtonState::any(Self) -> Bool
 pub fn ButtonState::held(Self, Button) -> Bool
+
+pub(all) enum Key {
+  A
+  B
+  C
+  D
+  E
+  F
+  G
+  H
+  I
+  J
+  K
+  L
+  M
+  N
+  O
+  P
+  Q
+  R
+  S
+  T
+  U
+  V
+  W
+  X
+  Y
+  Z
+  Digit0
+  Digit1
+  Digit2
+  Digit3
+  Digit4
+  Digit5
+  Digit6
+  Digit7
+  Digit8
+  Digit9
+  Minus
+  Equals
+  LeftBracket
+  RightBracket
+  Backslash
+  Semicolon
+  Apostrophe
+  Grave
+  Comma
+  Period
+  Slash
+  Space
+  Tab
+  Return
+  Backspace
+  Delete
+  Insert
+  PageUp
+  PageDown
+  Home
+  End
+  Up
+  Down
+  Left
+  Right
+  CapsLock
+  Ctrl
+  Shift
+  Alt
+  Escape
+  F1
+  F2
+  F3
+  F4
+  F5
+  F6
+  F7
+  F8
+  F9
+  F10
+  F11
+  F12
+  Numpad0
+  Numpad1
+  Numpad2
+  Numpad3
+  Numpad4
+  Numpad5
+  Numpad6
+  Numpad7
+  Numpad8
+  Numpad9
+  NumpadPlus
+  NumpadMinus
+  NumpadMultiply
+  NumpadDivide
+  NumpadEnter
+  NumpadPeriod
+} derive(Eq, @debug.Debug)
 
 pub(all) struct MapRemapResult {
   tile_id : Int
