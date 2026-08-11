@@ -524,10 +524,20 @@ fn encode_i32_le(buffer : FixedArray[Byte], offset : Int, value : Int) -> Unit {
 }
 
 ///|
+/// Copies `length` bytes within TIC-80's 96 KiB RAM.
+///
+/// `dest` and `src` are byte addresses. The source and destination ranges may
+/// overlap. A negative length or a range outside TIC-80 RAM is ignored. This
+/// function does not copy MoonBit heap objects or `Bytes` values.
 pub fn memcpy(dest : Int, src : Int, length : Int) -> Unit = "env" "memcpy"
 
 ///|
-pub fn memset(address : Int, value : Int, length : Int) -> Unit = "env" "memset"
+/// Fills `length` bytes of TIC-80 RAM with `value`.
+///
+/// `address` is a byte address. A negative length or a range outside TIC-80 RAM
+/// is ignored. This function does not operate on MoonBit heap objects or
+/// `Bytes` values.
+pub fn memset(address : Int, value : Byte, length : Int) -> Unit = "env" "memset"
 
 ///|
 pub fn mget(x : Int, y : Int) -> Int = "env" "mget"

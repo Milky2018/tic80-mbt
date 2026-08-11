@@ -52,7 +52,7 @@ pub fn map(x? : Int, y? : Int, w? : Int, h? : Int, sx? : Int, sy? : Int, transpa
 
 pub fn memcpy(Int, Int, Int) -> Unit
 
-pub fn memset(Int, Int, Int) -> Unit
+pub fn memset(Int, Byte, Int) -> Unit
 
 pub fn mget(Int, Int) -> Int
 
