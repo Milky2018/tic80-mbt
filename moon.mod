@@ -8,7 +8,7 @@ repository = "https://github.com/Milky2018/tic80-mbt.git"
 
 license = "Apache-2.0"
 
-keywords = [ "wasm", "tic80", "fantacy console" ]
+keywords = [ "wasm", "tic80", "fantasy console" ]
 
 supported_targets = "wasm"
 

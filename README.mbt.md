@@ -1,5 +1,15 @@
 # Milky2018/tic80-mbt
 
+## Installation
+
+Run the following command from the root of the cartridge module:
+
+```bash
+moon add Milky2018/tic80
+```
+
+This adds `Milky2018/tic80` to the module's dependencies. Each cartridge package must also import it and use the linker configuration below.
+
 ## Configuring a cartridge package
 
 Every package that builds a TIC-80 WebAssembly cartridge must import this package, use the `foreign_library` package kind, and configure the WebAssembly linker to use TIC-80's imported linear memory. Add the following declarations to the cartridge package's `moon.pkg` file:
