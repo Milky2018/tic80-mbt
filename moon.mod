@@ -4,7 +4,7 @@ version = "0.1.0"
 
 readme = "README.mbt.md"
 
-repository = ""
+repository = "https://github.com/Milky2018/tic80-mbt.git"
 
 license = "Apache-2.0"
 
@@ -14,4 +14,4 @@ supported_targets = "wasm"
 
 preferred_target = "wasm"
 
-description = ""
+description = "MoonBit bindings for TIC-80."

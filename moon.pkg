@@ -2,3 +2,5 @@ import {
   "Milky2018/tic80/raw",
   "moonbitlang/core/encoding/ascii",
 }
+
+pkgtype(kind: "library")

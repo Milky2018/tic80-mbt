@@ -15,17 +15,21 @@ options(
   link: {
     "wasm": {
       "import-memory": { "module": "env", "name": "memory" },
+      "memory-limits": { "min": 4, "max": 4 },
       "heap-start-address": 98304,
     },
   },
 )
 ```
 
-This configuration has four responsibilities:
+> **Important:** Do not omit `pkgtype(kind: "foreign_library")` from a cartridge package. It tells MoonBit to link the package as a foreign library whose exported callbacks can be loaded by TIC-80, rather than as a standalone program with a MoonBit `main` entry point.
+
+This configuration has five responsibilities:
 
 - `import { "Milky2018/tic80" }` makes the TIC-80 API available through the `@tic80` package qualifier.
 - `pkgtype(kind: "foreign_library")` builds a library-style WebAssembly module whose `#export_name` callbacks can be discovered by TIC-80. The cartridge is not a standalone WASI executable and does not define a MoonBit `main` entry point.
 - `"import-memory": { "module": "env", "name": "memory" }` makes the module import the `env.memory` linear memory supplied by TIC-80 instead of defining its own memory.
+- `"memory-limits": { "min": 4, "max": 4 }` declares that the imported memory is exactly four WebAssembly pages (256 KiB), matching TIC-80's limit. The first 96 KiB belongs to TIC-80 RAM, leaving at most 160 KiB for MoonBit static data, allocator metadata, and heap allocations.
 - `"heap-start-address": 98304` reserves the first 96 KiB (`0x18000`) of that memory for TIC-80's RAM layout and starts MoonBit heap allocation after it. TIC-80 copies VRAM, tiles, sprites, map data, input state, audio state, and the rest of its runtime RAM into this region before calling the cartridge.
 
 These settings belong to each cartridge package rather than to the reusable `Milky2018/tic80` API package itself.
