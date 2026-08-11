@@ -8,9 +8,11 @@ import {
 // Values
 pub fn any_btn() -> Bool
 
-pub fn btn(Int) -> Bool
+pub fn any_btnp() -> Bool
 
-pub fn btnp(id? : Int, hold? : Int, period? : Int) -> Bool
+pub fn btn(Button) -> Bool
+
+pub fn btnp(Button, hold? : Int, period? : Int) -> Bool
 
 pub fn button_state() -> ButtonState
 
@@ -103,11 +105,46 @@ pub fn vbank(Int) -> Byte
 // Errors
 
 // Types and methods
+pub(all) enum Button {
+  P1Up
+  P1Down
+  P1Left
+  P1Right
+  P1A
+  P1B
+  P1X
+  P1Y
+  P2Up
+  P2Down
+  P2Left
+  P2Right
+  P2A
+  P2B
+  P2X
+  P2Y
+  P3Up
+  P3Down
+  P3Left
+  P3Right
+  P3A
+  P3B
+  P3X
+  P3Y
+  P4Up
+  P4Down
+  P4Left
+  P4Right
+  P4A
+  P4B
+  P4X
+  P4Y
+} derive(Eq, @debug.Debug)
+
 pub struct ButtonState {
   // private fields
 } derive(Eq, @debug.Debug)
 pub fn ButtonState::any(Self) -> Bool
-pub fn ButtonState::held(Self, Int) -> Bool
+pub fn ButtonState::held(Self, Button) -> Bool
 
 pub(all) struct MapRemapResult {
   tile_id : Int

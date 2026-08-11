@@ -5,11 +5,51 @@
 // Remaining address arguments are byte offsets in the imported linear memory.
 
 ///|
+/// A button on one of the four TIC-80 gamepads.
+///
+/// The explicit tags are the button IDs expected by the TIC-80 host ABI.
+pub(all) enum Button {
+  P1Up = 0
+  P1Down = 1
+  P1Left = 2
+  P1Right = 3
+  P1A = 4
+  P1B = 5
+  P1X = 6
+  P1Y = 7
+  P2Up = 8
+  P2Down = 9
+  P2Left = 10
+  P2Right = 11
+  P2A = 12
+  P2B = 13
+  P2X = 14
+  P2Y = 15
+  P3Up = 16
+  P3Down = 17
+  P3Left = 18
+  P3Right = 19
+  P3A = 20
+  P3B = 21
+  P3X = 22
+  P3Y = 23
+  P4Up = 24
+  P4Down = 25
+  P4Left = 26
+  P4Right = 27
+  P4A = 28
+  P4B = 29
+  P4X = 30
+  P4Y = 31
+} derive(Debug, Eq)
+
+///|
+fn Button::to_int(self : Button) -> Int = "%identity"
+
+///|
 /// Returns whether the selected gamepad button is currently held.
-/// Panics if `id` is outside `0..<32`.
-pub fn btn(id : Int) -> Bool {
-  check_button_id(id)
-  raw_btn(id) != 0
+pub fn btn(button : Button) -> Bool {
+  raw_btn(button.to_int()) != 0
 }
 
 ///|
@@ -20,9 +60,6 @@ pub fn any_btn() -> Bool {
 
 ///|
 /// An immutable snapshot of all 32 TIC-80 gamepad buttons.
-///
-/// Button IDs are in `0..<32`. Each gamepad occupies eight consecutive IDs:
-/// Up, Down, Left, Right, A, B, X, and Y.
 #valtype
 pub struct ButtonState {
   priv bits : UInt
@@ -36,10 +73,8 @@ pub fn button_state() -> ButtonState {
 
 ///|
 /// Returns whether the selected button was held in this snapshot.
-/// Panics if `id` is outside `0..<32`.
-pub fn ButtonState::held(self : ButtonState, id : Int) -> Bool {
-  check_button_id(id)
-  (self.bits & (1U << id)) != 0U
+pub fn ButtonState::held(self : ButtonState, button : Button) -> Bool {
+  (self.bits & (1U << button.to_int())) != 0U
 }
 
 ///|
@@ -49,17 +84,22 @@ pub fn ButtonState::any(self : ButtonState) -> Bool {
 }
 
 ///|
-fn check_button_id(id : Int) -> Unit {
-  if id < 0 || id >= 32 {
-    abort("button id must be in 0..<32")
-  }
-}
-
-///|
 fn raw_btn(id : Int) -> Int = "env" "btn"
 
 ///|
-pub fn btnp(id? : Int = -1, hold? : Int = -1, period? : Int = -1) -> Bool = "env" "btnp"
+/// Returns whether a button was newly pressed.
+pub fn btnp(button : Button, hold? : Int = -1, period? : Int = -1) -> Bool {
+  raw_btnp(button.to_int(), hold, period) != 0
+}
+
+///|
+/// Returns whether any button was newly pressed.
+pub fn any_btnp() -> Bool {
+  raw_btnp(-1, -1, -1) != 0
+}
+
+///|
+fn raw_btnp(id : Int, hold : Int, period : Int) -> Int = "env" "btnp"
 
 ///|
 pub fn clip(x? : Int = -1, y? : Int = -1, w? : Int = -1, h? : Int = -1) -> Unit = "env" "clip"

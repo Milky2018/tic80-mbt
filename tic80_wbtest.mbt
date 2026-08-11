@@ -51,23 +51,52 @@ test "encode C text" {
 test "decode button state" {
   let empty : ButtonState = { bits: 0U }
   assert_false(empty.any())
-  assert_false(empty.held(0))
-  assert_false(empty.held(31))
+  assert_false(empty.held(P1Up))
+  assert_false(empty.held(P4Y))
   let buttons : ButtonState = { bits: (1U << 0) | (1U << 31) }
   assert_true(buttons.any())
-  assert_true(buttons.held(0))
-  assert_false(buttons.held(1))
-  assert_true(buttons.held(31))
+  assert_true(buttons.held(P1Up))
+  assert_false(buttons.held(P1Down))
+  assert_true(buttons.held(P4Y))
 }
 
 ///|
-test "panic ButtonState::held rejects a negative button id" {
-  let buttons : ButtonState = { bits: 0U }
-  ignore(buttons.held(-1))
-}
-
-///|
-test "panic ButtonState::held rejects a button id above the range" {
-  let buttons : ButtonState = { bits: 0U }
-  ignore(buttons.held(32))
+test "button IDs match the TIC-80 ABI" {
+  let buttons : Array[(Button, Int)] = [
+    (P1Up, 0),
+    (P1Down, 1),
+    (P1Left, 2),
+    (P1Right, 3),
+    (P1A, 4),
+    (P1B, 5),
+    (P1X, 6),
+    (P1Y, 7),
+    (P2Up, 8),
+    (P2Down, 9),
+    (P2Left, 10),
+    (P2Right, 11),
+    (P2A, 12),
+    (P2B, 13),
+    (P2X, 14),
+    (P2Y, 15),
+    (P3Up, 16),
+    (P3Down, 17),
+    (P3Left, 18),
+    (P3Right, 19),
+    (P3A, 20),
+    (P3B, 21),
+    (P3X, 22),
+    (P3Y, 23),
+    (P4Up, 24),
+    (P4Down, 25),
+    (P4Left, 26),
+    (P4Right, 27),
+    (P4A, 28),
+    (P4B, 29),
+    (P4X, 30),
+    (P4Y, 31),
+  ]
+  for pair in buttons {
+    assert_eq(pair.0.to_int(), pair.1)
+  }
 }
