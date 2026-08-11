@@ -20,6 +20,22 @@ test "decode mouse state" {
 }
 
 ///|
+test "sprite flag arguments accept their boundary values" {
+  check_sprite_flag_args(0, 0)
+  check_sprite_flag_args(511, 7)
+}
+
+///|
+test "panic sprite flags reject a negative sprite ID" {
+  check_sprite_flag_args(-1, 0)
+}
+
+///|
+test "panic sprite flags reject an invalid flag" {
+  check_sprite_flag_args(0, 8)
+}
+
+///|
 test "map remap trampoline" {
   let buffer : FixedArray[Byte] = [
     b'\x07', b'\x00', b'\x00', b'\x00', b'\x02', b'\x00', b'\x00', b'\x00', b'\x03',

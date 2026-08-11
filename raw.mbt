@@ -136,10 +136,43 @@ pub fn ellib(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit = "env" "e
 pub fn exit() -> Unit = "env" "exit"
 
 ///|
-pub fn fget(id : Int, flag : Int) -> Bool = "env" "fget"
+/// Returns whether one of a sprite's eight user-defined flags is set.
+///
+/// `sprite_id` ranges from 0 through 511 and `flag` ranges from 0 through 7.
+/// Flag meanings are defined by the cartridge. Panics when either argument is
+/// outside its valid range.
+pub fn fget(sprite_id : Int, flag : Int) -> Bool {
+  check_sprite_flag_args(sprite_id, flag)
+  raw_fget(sprite_id, flag) != 0
+}
 
 ///|
-pub fn fset(id : Int, flag : Int, value : Bool) -> Unit = "env" "fset"
+/// Sets or clears one of a sprite's eight user-defined flags.
+///
+/// `sprite_id` ranges from 0 through 511 and `flag` ranges from 0 through 7.
+/// The change affects runtime RAM; use `sync` with the `Flags` section and
+/// `to_cart=true` to copy runtime flags back to a cartridge resource bank.
+/// Panics when either argument is outside its valid range.
+pub fn fset(sprite_id : Int, flag : Int, value : Bool) -> Unit {
+  check_sprite_flag_args(sprite_id, flag)
+  raw_fset(sprite_id, flag, value)
+}
+
+///|
+fn check_sprite_flag_args(sprite_id : Int, flag : Int) -> Unit {
+  if sprite_id < 0 || sprite_id >= 512 {
+    abort("sprite id must be between 0 and 511")
+  }
+  if flag < 0 || flag >= 8 {
+    abort("sprite flag must be between 0 and 7")
+  }
+}
+
+///|
+fn raw_fget(sprite_id : Int, flag : Int) -> Int = "env" "fget"
+
+///|
+fn raw_fset(sprite_id : Int, flag : Int, value : Bool) -> Unit = "env" "fset"
 
 ///|
 /// Draws ASCII text with a custom raster font. Panics if `text` contains a
