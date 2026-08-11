@@ -574,9 +574,19 @@ pub fn peek2(address : Int) -> Byte = "env" "peek2"
 pub fn peek1(address : Int) -> Byte = "env" "peek1"
 
 ///|
-/// Reads persistent memory when `value` is -1, otherwise writes `value` and
-/// returns the previous value.
-pub fn pmem(index : Int, value? : Int64 = -1L) -> UInt = "env" "pmem"
+/// Reads a value from a persistent-memory slot.
+pub fn pmem(index : Int) -> UInt {
+  raw_pmem(index, -1L)
+}
+
+///|
+/// Writes a persistent-memory slot and returns its previous value.
+pub fn pmem_set(index : Int, value : UInt) -> UInt {
+  raw_pmem(index, value.to_int64())
+}
+
+///|
+fn raw_pmem(index : Int, value : Int64) -> UInt = "env" "pmem"
 
 ///|
 pub fn poke(address : Int, value : Int, bits? : Int = 8) -> Unit = "env" "poke"

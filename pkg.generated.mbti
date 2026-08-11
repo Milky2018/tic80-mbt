@@ -70,7 +70,9 @@ pub fn peek4(Int) -> Byte
 
 pub fn pix(Int, Int, color? : Int) -> Byte
 
-pub fn pmem(Int, value? : Int64) -> UInt
+pub fn pmem(Int) -> UInt
+
+pub fn pmem_set(Int, UInt) -> UInt
 
 pub fn poke(Int, Int, bits? : Int) -> Unit
 
