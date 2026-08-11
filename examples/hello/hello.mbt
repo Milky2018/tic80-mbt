@@ -1,7 +1,11 @@
 ///|
 #export_name("BOOT")
 pub fn boot() -> Unit {
-  ignore(@tic80.btn())
+  ignore(@tic80.btn(0))
+  ignore(@tic80.any_btn())
+  let buttons = @tic80.button_state()
+  ignore(buttons.held(0))
+  ignore(buttons.any())
   ignore(@tic80.btnp())
   @tic80.clip()
   @tic80.cls()

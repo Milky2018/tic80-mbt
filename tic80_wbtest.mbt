@@ -46,3 +46,28 @@ test "map remap trampoline" {
 test "encode C text" {
   assert_eq(encode_c_text("TIC\n80"), b"TIC\n80\x00")
 }
+
+///|
+test "decode button state" {
+  let empty : ButtonState = { bits: 0U }
+  assert_false(empty.any())
+  assert_false(empty.held(0))
+  assert_false(empty.held(31))
+  let buttons : ButtonState = { bits: (1U << 0) | (1U << 31) }
+  assert_true(buttons.any())
+  assert_true(buttons.held(0))
+  assert_false(buttons.held(1))
+  assert_true(buttons.held(31))
+}
+
+///|
+test "panic ButtonState::held rejects a negative button id" {
+  let buttons : ButtonState = { bits: 0U }
+  ignore(buttons.held(-1))
+}
+
+///|
+test "panic ButtonState::held rejects a button id above the range" {
+  let buttons : ButtonState = { bits: 0U }
+  ignore(buttons.held(32))
+}

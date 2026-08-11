@@ -6,9 +6,13 @@ import {
 }
 
 // Values
-pub fn btn(id? : Int) -> Int
+pub fn any_btn() -> Bool
+
+pub fn btn(Int) -> Bool
 
 pub fn btnp(id? : Int, hold? : Int, period? : Int) -> Bool
+
+pub fn button_state() -> ButtonState
 
 pub fn circ(Int, Int, Int, Int) -> Unit
 
@@ -99,6 +103,12 @@ pub fn vbank(Int) -> Byte
 // Errors
 
 // Types and methods
+pub struct ButtonState {
+  // private fields
+} derive(Eq, @debug.Debug)
+pub fn ButtonState::any(Self) -> Bool
+pub fn ButtonState::held(Self, Int) -> Bool
+
 pub(all) struct MapRemapResult {
   tile_id : Int
   flip : Int

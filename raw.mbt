@@ -5,8 +5,58 @@
 // Remaining address arguments are byte offsets in the imported linear memory.
 
 ///|
-/// Returns the selected button state, or the button bit mask when `id` is -1.
-pub fn btn(id? : Int = -1) -> Int = "env" "btn"
+/// Returns whether the selected gamepad button is currently held.
+/// Panics if `id` is outside `0..<32`.
+pub fn btn(id : Int) -> Bool {
+  check_button_id(id)
+  raw_btn(id) != 0
+}
+
+///|
+/// Returns whether any button on any gamepad is currently held.
+pub fn any_btn() -> Bool {
+  raw_btn(-1) != 0
+}
+
+///|
+/// An immutable snapshot of all 32 TIC-80 gamepad buttons.
+///
+/// Button IDs are in `0..<32`. Each gamepad occupies eight consecutive IDs:
+/// Up, Down, Left, Right, A, B, X, and Y.
+#valtype
+pub struct ButtonState {
+  priv bits : UInt
+} derive(Debug, Eq)
+
+///|
+/// Captures all four gamepads in one host call.
+pub fn button_state() -> ButtonState {
+  { bits: raw_btn(-1).reinterpret_as_uint() }
+}
+
+///|
+/// Returns whether the selected button was held in this snapshot.
+/// Panics if `id` is outside `0..<32`.
+pub fn ButtonState::held(self : ButtonState, id : Int) -> Bool {
+  check_button_id(id)
+  (self.bits & (1U << id)) != 0U
+}
+
+///|
+/// Returns whether this snapshot contains any held button.
+pub fn ButtonState::any(self : ButtonState) -> Bool {
+  self.bits != 0U
+}
+
+///|
+fn check_button_id(id : Int) -> Unit {
+  if id < 0 || id >= 32 {
+    abort("button id must be in 0..<32")
+  }
+}
+
+///|
+fn raw_btn(id : Int) -> Int = "env" "btn"
 
 ///|
 pub fn btnp(id? : Int = -1, hold? : Int = -1, period? : Int = -1) -> Bool = "env" "btnp"
