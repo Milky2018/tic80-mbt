@@ -110,26 +110,32 @@ pub fn cls(color? : Int = 0) -> Unit {
 }
 
 ///|
+/// Draws a filled circle centered at `(x, y)`.
 pub fn circ(x : Int, y : Int, radius : Int, color : Int) -> Unit {
   @raw.raw_circ(x, y, radius, color)
 }
 
 ///|
+/// Draws a one-pixel circle outline centered at `(x, y)`.
 pub fn circb(x : Int, y : Int, radius : Int, color : Int) -> Unit {
   @raw.raw_circb(x, y, radius, color)
 }
 
 ///|
+/// Draws a filled ellipse centered at `(x, y)` with the given semi-axes.
 pub fn elli(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit {
   @raw.raw_elli(x, y, a, b, color)
 }
 
 ///|
+/// Draws a one-pixel ellipse outline centered at `(x, y)` with the given
+/// semi-axes.
 pub fn ellib(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit {
   @raw.raw_ellib(x, y, a, b, color)
 }
 
 ///|
+/// Stops the current cartridge and returns to the TIC-80 console.
 pub fn exit() -> Unit {
   @raw.raw_exit()
 }
@@ -325,6 +331,7 @@ pub fn any_keyp() -> Bool {
 }
 
 ///|
+/// Draws a straight line from `(x0, y0)` to `(x1, y1)`.
 pub fn line(
   x0 : Float,
   y0 : Float,
@@ -489,16 +496,22 @@ pub fn memset(address : Int, value : Byte, length : Int) -> Unit {
 }
 
 ///|
+/// Returns the tile ID at map coordinates `(x, y)`.
 pub fn mget(x : Int, y : Int) -> Int {
   @raw.raw_mget(x, y)
 }
 
 ///|
+/// Sets the tile ID at map coordinates `(x, y)`.
 pub fn mset(x : Int, y : Int, tile_id : Int) -> Unit {
   @raw.raw_mset(x, y, tile_id)
 }
 
 ///|
+/// A snapshot of the mouse cursor, wheel, and button state.
+///
+/// `x` and `y` are screen coordinates. `scroll_x` and `scroll_y` are signed
+/// wheel movements for the current frame.
 pub(all) struct MouseState {
   x : Int
   y : Int
@@ -715,11 +728,13 @@ pub fn print(
 }
 
 ///|
+/// Draws a filled rectangle at `(x, y)` with the given size.
 pub fn rect(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit {
   @raw.raw_rect(x, y, w, h, color)
 }
 
 ///|
+/// Draws a one-pixel rectangle outline at `(x, y)` with the given size.
 pub fn rectb(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit {
   @raw.raw_rectb(x, y, w, h, color)
 }
@@ -838,6 +853,10 @@ pub fn spr(
 }
 
 ///|
+/// A cartridge resource section that can be transferred by `sync`.
+///
+/// Each variant corresponds to one bit in TIC-80's resource synchronization
+/// mask.
 pub(all) enum SyncSection {
   Tiles
   Sprites
@@ -871,11 +890,13 @@ fn encode_sync_mask(sections : ArrayView[SyncSection]) -> Int {
 }
 
 ///|
+/// Returns the elapsed time in milliseconds since the cartridge started.
 pub fn time() -> Float {
   @raw.raw_time()
 }
 
 ///|
+/// Returns the current Unix timestamp in seconds.
 pub fn tstamp() -> UInt {
   @raw.raw_tstamp()
 }
@@ -893,6 +914,7 @@ fn encode_c_text(text : StringView) -> Bytes {
 }
 
 ///|
+/// Draws a filled triangle with the given vertices.
 pub fn tri(
   x1 : Float,
   y1 : Float,
@@ -906,6 +928,7 @@ pub fn tri(
 }
 
 ///|
+/// Draws a one-pixel triangle outline with the given vertices.
 pub fn trib(
   x1 : Float,
   y1 : Float,
