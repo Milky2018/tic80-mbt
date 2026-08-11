@@ -102,7 +102,19 @@ pub fn any_btnp() -> Bool {
 fn raw_btnp(id : Int, hold : Int, period : Int) -> Int = "env" "btnp"
 
 ///|
-pub fn clip(x? : Int = -1, y? : Int = -1, w? : Int = -1, h? : Int = -1) -> Unit = "env" "clip"
+/// Sets the screen clipping rectangle.
+pub fn clip(x : Int, y : Int, w : Int, h : Int) -> Unit {
+  raw_clip(x, y, w, h)
+}
+
+///|
+/// Restores the clipping rectangle to the full screen.
+pub fn clip_reset() -> Unit {
+  raw_clip(-1, -1, -1, -1)
+}
+
+///|
+fn raw_clip(x : Int, y : Int, w : Int, h : Int) -> Unit = "env" "clip"
 
 ///|
 pub fn cls(color? : Int = -1) -> Unit = "env" "cls"

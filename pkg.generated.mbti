@@ -24,7 +24,9 @@ pub fn circ(Int, Int, Int, Int) -> Unit
 
 pub fn circb(Int, Int, Int, Int) -> Unit
 
-pub fn clip(x? : Int, y? : Int, w? : Int, h? : Int) -> Unit
+pub fn clip(Int, Int, Int, Int) -> Unit
+
+pub fn clip_reset() -> Unit
 
 pub fn cls(color? : Int) -> Unit
 
