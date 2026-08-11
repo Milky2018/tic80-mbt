@@ -560,14 +560,42 @@ fn decode_i8(byte : Byte) -> Int {
 }
 
 ///|
+/// Starts playing one of the eight tracks created in TIC-80's Music Editor.
+///
+/// `track` ranges from 0 through 7. By default playback starts at the beginning
+/// of the track, loops after its final populated frame, does not sustain notes
+/// across frame boundaries, and uses the tempo and speed stored in the track.
+/// Use `frame` and `row` to start at a specific position, or `tempo` and `speed`
+/// to override the track settings. Call `music_stop` to stop playback.
 pub fn music(
-  track? : Int = -1,
+  track : Int,
   frame? : Int = -1,
   row? : Int = -1,
   loop_? : Bool = true,
   sustain? : Bool = false,
   tempo? : Int = -1,
   speed? : Int = -1,
+) -> Unit {
+  raw_music(track, frame, row, loop_, sustain, tempo, speed)
+}
+
+///|
+/// Stops the currently playing music and resets its channels.
+///
+/// This does not stop sound effects started independently with `sfx`.
+pub fn music_stop() -> Unit {
+  raw_music(-1, -1, -1, false, false, -1, -1)
+}
+
+///|
+fn raw_music(
+  track : Int,
+  frame : Int,
+  row : Int,
+  loop_ : Bool,
+  sustain : Bool,
+  tempo : Int,
+  speed : Int,
 ) -> Unit = "env" "music"
 
 ///|

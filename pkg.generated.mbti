@@ -60,7 +60,9 @@ pub fn mouse() -> MouseState
 
 pub fn mset(Int, Int, Int) -> Unit
 
-pub fn music(track? : Int, frame? : Int, row? : Int, loop_? : Bool, sustain? : Bool, tempo? : Int, speed? : Int) -> Unit
+pub fn music(Int, frame? : Int, row? : Int, loop_? : Bool, sustain? : Bool, tempo? : Int, speed? : Int) -> Unit
+
+pub fn music_stop() -> Unit
 
 pub fn peek(Int, bits? : Int) -> Byte
 
