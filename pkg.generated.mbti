@@ -94,7 +94,9 @@ pub fn rect(Int, Int, Int, Int, Int) -> Unit
 
 pub fn rectb(Int, Int, Int, Int, Int) -> Unit
 
-pub fn sfx(Int, note? : Int, octave? : Int, duration? : Int, channel? : Int, volume_left? : Int, volume_right? : Int, speed? : Int) -> Unit
+pub fn sfx(Int, note? : Int, duration? : Int, channel? : SfxChannel, volume_left? : Int, volume_right? : Int, speed? : Int) -> Unit
+
+pub fn sfx_stop(channel? : SfxChannel) -> Unit
 
 pub fn spr(Int, Int, Int, transparent_colors? : Bytes, scale? : Int, flip? : Flip, rotate? : Rotation, w? : Int, h? : Int) -> Unit
 
@@ -285,6 +287,13 @@ pub(all) enum Rotation {
   Clockwise90
   Clockwise180
   Clockwise270
+} derive(Eq, @debug.Debug)
+
+pub(all) enum SfxChannel {
+  Channel0
+  Channel1
+  Channel2
+  Channel3
 } derive(Eq, @debug.Debug)
 
 pub(all) enum SyncSection {

@@ -687,15 +687,101 @@ pub fn rect(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit = "env" "re
 pub fn rectb(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit = "env" "rectb"
 
 ///|
+/// One of TIC-80's four sound-effect channels.
+///
+/// The explicit tags are the channel IDs expected by the TIC-80 host ABI.
+pub(all) enum SfxChannel {
+  Channel0 = 0
+  Channel1 = 1
+  Channel2 = 2
+  Channel3 = 3
+} derive(Debug, Eq)
+
+///|
+fn SfxChannel::to_int(self : SfxChannel) -> Int = "%identity"
+
+///|
+/// Plays one of the 64 effects created in TIC-80's SFX Editor.
+///
+/// `note` is a combined note number from 0 through 95, with twelve notes per
+/// octave. When omitted, the note stored in the selected effect is used.
+/// `duration` is measured in 60 Hz ticks; -1 plays continuously. The left and
+/// right volumes range from 0 through 15. When `speed` is omitted, the speed
+/// stored in the selected effect is used; explicit speeds range from -4 through
+/// 3. Call `sfx_stop` to stop an effect on a channel.
+///
+/// Panics if `id` is outside the range 0 through 63.
 pub fn sfx(
   id : Int,
-  note? : Int = -1,
-  octave? : Int = -1,
+  note? : Int,
   duration? : Int = -1,
-  channel? : Int = 0,
+  channel? : SfxChannel = Channel0,
   volume_left? : Int = 15,
   volume_right? : Int = 15,
-  speed? : Int = 0,
+  speed? : Int,
+) -> Unit {
+  if id < 0 || id >= 64 {
+    abort("sfx: id must be between 0 and 63")
+  }
+  let combined_note = match note {
+    None => read_sfx_default_note(id)
+    Some(note) => note
+  }
+  let (raw_note, raw_octave) = split_sfx_note(combined_note)
+  let raw_speed = match speed {
+    None => 8
+    Some(speed) => speed
+  }
+  raw_sfx(
+    id,
+    raw_note,
+    raw_octave,
+    duration,
+    channel.to_int(),
+    volume_left,
+    volume_right,
+    raw_speed,
+  )
+}
+
+///|
+/// Stops the sound effect playing on `channel`.
+///
+/// This does not stop music playback or effects on the other channels.
+pub fn sfx_stop(channel? : SfxChannel = Channel0) -> Unit {
+  raw_sfx(-1, 0, 0, -1, channel.to_int(), 15, 15, 8)
+}
+
+///|
+fn read_sfx_default_note(id : Int) -> Int {
+  // TIC-80 stores 64 66-byte effects at 0x100e4. The final two bytes hold
+  // the effect's octave, speed, note, and stereo flags.
+  let metadata_address = 0x100e4 + id * 66 + 64
+  decode_sfx_default_note(peek(metadata_address), peek(metadata_address + 1))
+}
+
+///|
+fn decode_sfx_default_note(metadata0 : Byte, metadata1 : Byte) -> Int {
+  let octave = metadata0.to_int() & 0x07
+  let note = metadata1.to_int() & 0x0f
+  note + octave * 12
+}
+
+///|
+fn split_sfx_note(note : Int) -> (Int, Int) {
+  (note % 12, note / 12)
+}
+
+///|
+fn raw_sfx(
+  id : Int,
+  note : Int,
+  octave : Int,
+  duration : Int,
+  channel : Int,
+  volume_left : Int,
+  volume_right : Int,
+  speed : Int,
 ) -> Unit = "env" "sfx"
 
 ///|

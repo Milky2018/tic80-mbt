@@ -269,3 +269,25 @@ test "texture sources match the TIC-80 ABI" {
   assert_eq(TileMap.to_int(), 1)
   assert_eq(OtherVideoBank.to_int(), 2)
 }
+
+///|
+test "SFX channels match the TIC-80 ABI" {
+  assert_eq(Channel0.to_int(), 0)
+  assert_eq(Channel1.to_int(), 1)
+  assert_eq(Channel2.to_int(), 2)
+  assert_eq(Channel3.to_int(), 3)
+}
+
+///|
+test "decode the default SFX note" {
+  assert_eq(decode_sfx_default_note(b'\x00', b'\x00'), 0)
+  assert_eq(decode_sfx_default_note(b'\xfd', b'\xf2'), 62)
+  assert_eq(decode_sfx_default_note(b'\x07', b'\x0b'), 95)
+}
+
+///|
+test "split combined SFX notes for the host ABI" {
+  assert_eq(split_sfx_note(0), (0, 0))
+  assert_eq(split_sfx_note(14), (2, 1))
+  assert_eq(split_sfx_note(95), (11, 7))
+}
