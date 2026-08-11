@@ -307,3 +307,31 @@ test "split combined SFX notes for the host ABI" {
   assert_eq(split_sfx_note(14), (2, 1))
   assert_eq(split_sfx_note(95), (11, 7))
 }
+
+///|
+test "music tracks and persistent-memory indices accept their boundaries" {
+  check_music_track(0)
+  check_music_track(7)
+  check_pmem_index(0)
+  check_pmem_index(255)
+}
+
+///|
+test "panic music rejects a negative track" {
+  check_music_track(-1)
+}
+
+///|
+test "panic music rejects a track above the valid range" {
+  check_music_track(8)
+}
+
+///|
+test "panic persistent memory rejects a negative index" {
+  check_pmem_index(-1)
+}
+
+///|
+test "panic persistent memory rejects an index above the valid range" {
+  check_pmem_index(256)
+}

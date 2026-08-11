@@ -610,6 +610,7 @@ fn decode_i8(byte : Byte) -> Int {
 /// across frame boundaries, and uses the tempo and speed stored in the track.
 /// Use `frame` and `row` to start at a specific position, or `tempo` and `speed`
 /// to override the track settings. Call `music_stop` to stop playback.
+/// Panics if `track` is outside the range 0 through 7.
 pub fn music(
   track : Int,
   frame? : Int = -1,
@@ -619,7 +620,15 @@ pub fn music(
   tempo? : Int = -1,
   speed? : Int = -1,
 ) -> Unit {
+  check_music_track(track)
   raw_music(track, frame, row, loop_, sustain, tempo, speed)
+}
+
+///|
+fn check_music_track(track : Int) -> Unit {
+  if track < 0 || track >= 8 {
+    abort("music: track must be between 0 and 7")
+  }
 }
 
 ///|
@@ -694,14 +703,27 @@ fn raw_peek(address : Int, bits : Int) -> Byte = "env" "peek"
 
 ///|
 /// Reads a value from a persistent-memory slot.
+///
+/// `index` ranges from 0 through 255. Panics when it is outside that range.
 pub fn pmem(index : Int) -> UInt {
+  check_pmem_index(index)
   raw_pmem(index, -1L)
 }
 
 ///|
 /// Writes a persistent-memory slot and returns its previous value.
+///
+/// `index` ranges from 0 through 255. Panics when it is outside that range.
 pub fn pmem_set(index : Int, value : UInt) -> UInt {
+  check_pmem_index(index)
   raw_pmem(index, value.to_int64())
+}
+
+///|
+fn check_pmem_index(index : Int) -> Unit {
+  if index < 0 || index >= 256 {
+    abort("persistent-memory index must be between 0 and 255")
+  }
 }
 
 ///|
