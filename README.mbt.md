@@ -10,6 +10,12 @@ moon add Milky2018/tic80
 
 This adds `Milky2018/tic80` to the module's dependencies. Each cartridge package must also import it and use the linker configuration below.
 
+## TIC-80 runtime requirement
+
+Use a TIC-80 build based on the [`main` branch of `Milky2018/TIC-80`](https://github.com/Milky2018/TIC-80). This branch updates the bundled wasm3 runtime and its TIC-80 integration to support the imported linear memory emitted by the current MoonBit toolchain.
+
+TIC-80 builds without these changes may reject a MoonBit cartridge with `only one memory per module is supported` or `unallocated linear memory`, even when the cartridge package uses the required linker configuration below.
+
 ## Configuring a cartridge package
 
 Every package that builds a TIC-80 WebAssembly cartridge must import this package, use the `foreign_library` package kind, and configure the WebAssembly linker to use TIC-80's imported linear memory. Add the following declarations to the cartridge package's `moon.pkg` file:
