@@ -7,50 +7,50 @@
 ///|
 /// Direct `env.btn` import. Returns the current state for `id`; `-1` requests
 /// the combined button bitmask.
-pub fn raw_btn(id : Int) -> Int = "env" "btn"
+pub fn btn(id : Int) -> Int = "env" "btn"
 
 ///|
 /// Direct `env.btnp` import. Reports a new press, or repeats it after `hold`
 /// frames every `period` frames. `-1` selects TIC-80's defaults.
-pub fn raw_btnp(id : Int, hold : Int, period : Int) -> Int = "env" "btnp"
+pub fn btnp(id : Int, hold : Int, period : Int) -> Int = "env" "btnp"
 
 ///|
 /// Direct `env.clip` import. Each `-1` argument is replaced by its full-screen
 /// default.
-pub fn raw_clip(x : Int, y : Int, w : Int, h : Int) -> Unit = "env" "clip"
+pub fn clip(x : Int, y : Int, w : Int, h : Int) -> Unit = "env" "clip"
 
 ///|
 /// Direct `env.cls` import. Clears the screen with `color`.
-pub fn raw_cls(color : Int) -> Unit = "env" "cls"
+pub fn cls(color : Int) -> Unit = "env" "cls"
 
 ///|
 /// Direct `env.circ` import. Draws a filled circle.
-pub fn raw_circ(x : Int, y : Int, radius : Int, color : Int) -> Unit = "env" "circ"
+pub fn circ(x : Int, y : Int, radius : Int, color : Int) -> Unit = "env" "circ"
 
 ///|
 /// Direct `env.circb` import. Draws a circle outline.
-pub fn raw_circb(x : Int, y : Int, radius : Int, color : Int) -> Unit = "env" "circb"
+pub fn circb(x : Int, y : Int, radius : Int, color : Int) -> Unit = "env" "circb"
 
 ///|
 /// Direct `env.elli` import. Draws a filled ellipse with semi-axes `a` and `b`.
-pub fn raw_elli(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit = "env" "elli"
+pub fn elli(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit = "env" "elli"
 
 ///|
 /// Direct `env.ellib` import. Draws an ellipse outline with semi-axes `a` and
 /// `b`.
-pub fn raw_ellib(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit = "env" "ellib"
+pub fn ellib(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit = "env" "ellib"
 
 ///|
 /// Direct `env.exit` import. Returns from the cartridge to the TIC-80 console.
-pub fn raw_exit() -> Unit = "env" "exit"
+pub fn exit() -> Unit = "env" "exit"
 
 ///|
 /// Direct `env.fget` import. Returns whether a sprite flag is set as an integer.
-pub fn raw_fget(sprite_id : Int, flag : Int) -> Int = "env" "fget"
+pub fn fget(sprite_id : Int, flag : Int) -> Int = "env" "fget"
 
 ///|
 /// Direct `env.fset` import. Sets or clears a sprite flag.
-pub fn raw_fset(sprite_id : Int, flag : Int, value : Bool) -> Unit = "env" "fset"
+pub fn fset(sprite_id : Int, flag : Int, value : Bool) -> Unit = "env" "fset"
 
 ///|
 /// Direct `env.font` import. `text` must be NUL-terminated, and
@@ -58,7 +58,7 @@ pub fn raw_fset(sprite_id : Int, flag : Int, value : Bool) -> Unit = "env" "fset
 /// rendered text width.
 #unsafe_skip_stub_check
 #borrow(text, transparent_colors)
-pub fn raw_font(
+pub fn font(
   text : Bytes,
   x : Int,
   y : Int,
@@ -74,16 +74,16 @@ pub fn raw_font(
 ///|
 /// Direct `env.key` import. Returns the state of `keycode`; `-1` requests any
 /// keyboard key.
-pub fn raw_key(keycode : Int) -> Int = "env" "key"
+pub fn key(keycode : Int) -> Int = "env" "key"
 
 ///|
 /// Direct `env.keyp` import. Reports a new key press, with optional repeat
 /// timing. `-1` selects any key or TIC-80's timing defaults.
-pub fn raw_keyp(keycode : Int, hold : Int, period : Int) -> Int = "env" "keyp"
+pub fn keyp(keycode : Int, hold : Int, period : Int) -> Int = "env" "keyp"
 
 ///|
 /// Direct `env.line` import. Draws a straight line between two points.
-pub fn raw_line(
+pub fn line(
   x0 : Float,
   y0 : Float,
   x1 : Float,
@@ -107,7 +107,7 @@ pub(all) struct MapData {
 /// bytes. `-1` selects TIC-80's defaults for `x`, `y`, `w`, `h`, and `scale`.
 #unsafe_skip_stub_check
 #borrow(transparent_colors, map_data)
-pub fn raw_map(
+pub fn map(
   x : Int,
   y : Int,
   w : Int,
@@ -122,19 +122,19 @@ pub fn raw_map(
 
 ///|
 /// Direct `env.memcpy` import. Copies bytes within TIC-80 RAM.
-pub fn raw_memcpy(dest : Int, src : Int, length : Int) -> Unit = "env" "memcpy"
+pub fn memcpy(dest : Int, src : Int, length : Int) -> Unit = "env" "memcpy"
 
 ///|
 /// Direct `env.memset` import. Fills bytes within TIC-80 RAM.
-pub fn raw_memset(address : Int, value : Byte, length : Int) -> Unit = "env" "memset"
+pub fn memset(address : Int, value : Byte, length : Int) -> Unit = "env" "memset"
 
 ///|
 /// Direct `env.mget` import. Returns the tile ID at map coordinates `(x, y)`.
-pub fn raw_mget(x : Int, y : Int) -> Int = "env" "mget"
+pub fn mget(x : Int, y : Int) -> Int = "env" "mget"
 
 ///|
 /// Direct `env.mset` import. Changes a tile in the runtime map.
-pub fn raw_mset(x : Int, y : Int, tile_id : Int) -> Unit = "env" "mset"
+pub fn mset(x : Int, y : Int, tile_id : Int) -> Unit = "env" "mset"
 
 ///|
 /// Direct `env.mouse` import. `buffer` must contain at least nine bytes. The
@@ -142,11 +142,11 @@ pub fn raw_mset(x : Int, y : Int, tile_id : Int) -> Unit = "env" "mset"
 /// deltas, then left, middle, and right buttons.
 #unsafe_skip_stub_check
 #borrow(buffer)
-pub fn raw_mouse(buffer : FixedArray[Byte]) -> Unit = "env" "mouse"
+pub fn mouse(buffer : FixedArray[Byte]) -> Unit = "env" "mouse"
 
 ///|
 /// Direct `env.music` import. Starts a music track; `track = -1` stops playback.
-pub fn raw_music(
+pub fn music(
   track : Int,
   frame : Int,
   row : Int,
@@ -159,52 +159,52 @@ pub fn raw_music(
 ///|
 /// Direct `env.pix` import. A negative `color` reads a pixel; otherwise it
 /// writes the pixel. Returns the host's pixel result.
-pub fn raw_pix(x : Int, y : Int, color : Int) -> Byte = "env" "pix"
+pub fn pix(x : Int, y : Int, color : Int) -> Byte = "env" "pix"
 
 ///|
 /// Direct `env.peek` import. Reads a 1-, 2-, 4-, or 8-bit value from TIC-80 RAM.
-pub fn raw_peek(address : Int, bits : Int) -> Byte = "env" "peek"
+pub fn peek(address : Int, bits : Int) -> Byte = "env" "peek"
 
 ///|
 /// Direct `env.peek4` import. Reads a four-bit value using nibble addressing.
-pub fn raw_peek4(address : Int) -> Byte = "env" "peek4"
+pub fn peek4(address : Int) -> Byte = "env" "peek4"
 
 ///|
 /// Direct `env.peek2` import. Reads a two-bit value using two-bit addressing.
-pub fn raw_peek2(address : Int) -> Byte = "env" "peek2"
+pub fn peek2(address : Int) -> Byte = "env" "peek2"
 
 ///|
 /// Direct `env.peek1` import. Reads a bit using bit addressing.
-pub fn raw_peek1(address : Int) -> Byte = "env" "peek1"
+pub fn peek1(address : Int) -> Byte = "env" "peek1"
 
 ///|
 /// Direct `env.pmem` import. `index` must be between 0 and 255. `value = -1L`
 /// reads persistent memory; any other value writes it and returns the previous
 /// value.
-pub fn raw_pmem(index : Int, value : Int64) -> UInt = "env" "pmem"
+pub fn pmem(index : Int, value : Int64) -> UInt = "env" "pmem"
 
 ///|
 /// Direct `env.poke` import. Writes a 1-, 2-, 4-, or 8-bit value to TIC-80 RAM.
-pub fn raw_poke(address : Int, value : Int, bits : Int) -> Unit = "env" "poke"
+pub fn poke(address : Int, value : Int, bits : Int) -> Unit = "env" "poke"
 
 ///|
 /// Direct `env.poke4` import. Writes a four-bit value using nibble addressing.
-pub fn raw_poke4(address : Int, value : Int) -> Unit = "env" "poke4"
+pub fn poke4(address : Int, value : Int) -> Unit = "env" "poke4"
 
 ///|
 /// Direct `env.poke2` import. Writes a two-bit value using two-bit addressing.
-pub fn raw_poke2(address : Int, value : Int) -> Unit = "env" "poke2"
+pub fn poke2(address : Int, value : Int) -> Unit = "env" "poke2"
 
 ///|
 /// Direct `env.poke1` import. Writes a bit using bit addressing.
-pub fn raw_poke1(address : Int, value : Int) -> Unit = "env" "poke1"
+pub fn poke1(address : Int, value : Int) -> Unit = "env" "poke1"
 
 ///|
 /// Direct `env.print` import. `text` must be NUL-terminated. Draws the built-in
 /// font and returns the rendered width.
 #unsafe_skip_stub_check
 #borrow(text)
-pub fn raw_print(
+pub fn print(
   text : Bytes,
   x : Int,
   y : Int,
@@ -216,17 +216,17 @@ pub fn raw_print(
 
 ///|
 /// Direct `env.rect` import. Draws a filled rectangle.
-pub fn raw_rect(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit = "env" "rect"
+pub fn rect(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit = "env" "rect"
 
 ///|
 /// Direct `env.rectb` import. Draws a one-pixel rectangle outline.
-pub fn raw_rectb(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit = "env" "rectb"
+pub fn rectb(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit = "env" "rectb"
 
 ///|
 /// Direct `env.sfx` import. Plays an SFX; `id = -1` stops the selected channel.
 /// Invalid channels are ignored, and volume components are truncated to four
 /// bits.
-pub fn raw_sfx(
+pub fn sfx(
   id : Int,
   note : Int,
   octave : Int,
@@ -242,7 +242,7 @@ pub fn raw_sfx(
 /// `transparent_colors` must contain at least `color_count` bytes.
 #unsafe_skip_stub_check
 #borrow(transparent_colors)
-pub fn raw_spr(
+pub fn spr(
   id : Int,
   x : Int,
   y : Int,
@@ -258,26 +258,26 @@ pub fn raw_spr(
 ///|
 /// Direct `env.sync` import. Transfers resource sections between runtime memory
 /// and a cartridge bank. A zero mask selects every section.
-pub fn raw_sync(mask : Int, bank : Int, to_cart : Bool) -> Unit = "env" "sync"
+pub fn sync(mask : Int, bank : Int, to_cart : Bool) -> Unit = "env" "sync"
 
 ///|
 /// Direct `env.time` import. Returns milliseconds elapsed since startup.
-pub fn raw_time() -> Float = "env" "time"
+pub fn time() -> Float = "env" "time"
 
 ///|
 /// Direct `env.tstamp` import. Returns the current Unix timestamp in seconds.
-pub fn raw_tstamp() -> UInt = "env" "tstamp"
+pub fn tstamp() -> UInt = "env" "tstamp"
 
 ///|
 /// Direct `env.trace` import. `text` must be NUL-terminated; `color = -1`
 /// selects palette color 15.
 #unsafe_skip_stub_check
 #borrow(text)
-pub fn raw_trace(text : Bytes, color : Int) -> Unit = "env" "trace"
+pub fn trace(text : Bytes, color : Int) -> Unit = "env" "trace"
 
 ///|
 /// Direct `env.tri` import. Draws a filled triangle.
-pub fn raw_tri(
+pub fn tri(
   x1 : Float,
   y1 : Float,
   x2 : Float,
@@ -289,7 +289,7 @@ pub fn raw_tri(
 
 ///|
 /// Direct `env.trib` import. Draws a triangle outline.
-pub fn raw_trib(
+pub fn trib(
   x1 : Float,
   y1 : Float,
   x2 : Float,
@@ -305,7 +305,7 @@ pub fn raw_trib(
 /// least `color_count` bytes.
 #unsafe_skip_stub_check
 #borrow(transparent_colors)
-pub fn raw_ttri(
+pub fn ttri(
   x1 : Float,
   y1 : Float,
   x2 : Float,
@@ -330,4 +330,4 @@ pub fn raw_ttri(
 ///|
 /// Direct `env.vbank` import. Selects a video bank and returns the previously
 /// selected bank; `bank = -1` only queries the current bank.
-pub fn raw_vbank(bank : Int) -> Byte = "env" "vbank"
+pub fn vbank(bank : Int) -> Byte = "env" "vbank"

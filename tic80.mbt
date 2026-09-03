@@ -45,13 +45,13 @@ fn Button::to_int(self : Button) -> Int = "%identity"
 ///|
 /// Returns whether the selected gamepad button is currently held.
 pub fn btn(button : Button) -> Bool {
-  @raw.raw_btn(button.to_int()) != 0
+  @raw.btn(button.to_int()) != 0
 }
 
 ///|
 /// Returns whether any button on any gamepad is currently held.
 pub fn any_btn() -> Bool {
-  @raw.raw_btn(-1) != 0
+  @raw.btn(-1) != 0
 }
 
 ///|
@@ -64,7 +64,7 @@ pub struct ButtonState {
 ///|
 /// Captures all four gamepads in one host call.
 pub fn button_state() -> ButtonState {
-  { bits: @raw.raw_btn(-1).reinterpret_as_uint() }
+  { bits: @raw.btn(-1).reinterpret_as_uint(), }
 }
 
 ///|
@@ -82,62 +82,62 @@ pub fn ButtonState::any(self : ButtonState) -> Bool {
 ///|
 /// Returns whether a button was newly pressed.
 pub fn btnp(button : Button, hold? : Int = -1, period? : Int = -1) -> Bool {
-  @raw.raw_btnp(button.to_int(), hold, period) != 0
+  @raw.btnp(button.to_int(), hold, period) != 0
 }
 
 ///|
 /// Returns whether any button was newly pressed.
 pub fn any_btnp() -> Bool {
-  @raw.raw_btnp(-1, -1, -1) != 0
+  @raw.btnp(-1, -1, -1) != 0
 }
 
 ///|
 /// Sets the screen clipping rectangle.
 pub fn clip(x : Int, y : Int, w : Int, h : Int) -> Unit {
-  @raw.raw_clip(x, y, w, h)
+  @raw.clip(x, y, w, h)
 }
 
 ///|
 /// Restores the clipping rectangle to the full screen.
 pub fn clip_reset() -> Unit {
-  @raw.raw_clip(-1, -1, -1, -1)
+  @raw.clip(-1, -1, -1, -1)
 }
 
 ///|
 /// Clears the screen with a color.
 pub fn cls(color? : Int = 0) -> Unit {
-  @raw.raw_cls(color)
+  @raw.cls(color)
 }
 
 ///|
 /// Draws a filled circle centered at `(x, y)`.
 pub fn circ(x : Int, y : Int, radius : Int, color : Int) -> Unit {
-  @raw.raw_circ(x, y, radius, color)
+  @raw.circ(x, y, radius, color)
 }
 
 ///|
 /// Draws a one-pixel circle outline centered at `(x, y)`.
 pub fn circb(x : Int, y : Int, radius : Int, color : Int) -> Unit {
-  @raw.raw_circb(x, y, radius, color)
+  @raw.circb(x, y, radius, color)
 }
 
 ///|
 /// Draws a filled ellipse centered at `(x, y)` with the given semi-axes.
 pub fn elli(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit {
-  @raw.raw_elli(x, y, a, b, color)
+  @raw.elli(x, y, a, b, color)
 }
 
 ///|
 /// Draws a one-pixel ellipse outline centered at `(x, y)` with the given
 /// semi-axes.
 pub fn ellib(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit {
-  @raw.raw_ellib(x, y, a, b, color)
+  @raw.ellib(x, y, a, b, color)
 }
 
 ///|
 /// Stops the current cartridge and returns to the TIC-80 console.
 pub fn exit() -> Unit {
-  @raw.raw_exit()
+  @raw.exit()
 }
 
 ///|
@@ -148,7 +148,7 @@ pub fn exit() -> Unit {
 /// outside its valid range.
 pub fn fget(sprite_id : Int, flag : Int) -> Bool {
   check_sprite_flag_args(sprite_id, flag)
-  @raw.raw_fget(sprite_id, flag) != 0
+  @raw.fget(sprite_id, flag) != 0
 }
 
 ///|
@@ -160,7 +160,7 @@ pub fn fget(sprite_id : Int, flag : Int) -> Bool {
 /// Panics when either argument is outside its valid range.
 pub fn fset(sprite_id : Int, flag : Int, value : Bool) -> Unit {
   check_sprite_flag_args(sprite_id, flag)
-  @raw.raw_fset(sprite_id, flag, value)
+  @raw.fset(sprite_id, flag, value)
 }
 
 ///|
@@ -188,7 +188,7 @@ pub fn font(
   scale? : Int = -1,
   alt? : Bool = false,
 ) -> Int {
-  @raw.raw_font(
+  @raw.font(
     encode_c_text(text),
     x,
     y,
@@ -309,25 +309,25 @@ fn Key::to_int(self : Key) -> Int = "%identity"
 ///|
 /// Returns whether the selected keyboard key is currently held.
 pub fn key(key : Key) -> Bool {
-  @raw.raw_key(key.to_int()) != 0
+  @raw.key(key.to_int()) != 0
 }
 
 ///|
 /// Returns whether any keyboard key is currently held.
 pub fn any_key() -> Bool {
-  @raw.raw_key(-1) != 0
+  @raw.key(-1) != 0
 }
 
 ///|
 /// Returns whether a key was newly pressed or repeated.
 pub fn keyp(key : Key, hold? : Int = -1, period? : Int = -1) -> Bool {
-  @raw.raw_keyp(key.to_int(), hold, period) != 0
+  @raw.keyp(key.to_int(), hold, period) != 0
 }
 
 ///|
 /// Returns whether any keyboard key was newly pressed.
 pub fn any_keyp() -> Bool {
-  @raw.raw_keyp(-1, -1, -1) != 0
+  @raw.keyp(-1, -1, -1) != 0
 }
 
 ///|
@@ -339,7 +339,7 @@ pub fn line(
   y1 : Float,
   color : Int,
 ) -> Unit {
-  @raw.raw_line(x0, y0, x1, y1, color)
+  @raw.line(x0, y0, x1, y1, color)
 }
 
 ///|
@@ -400,7 +400,7 @@ pub fn map(
         result_buffer: FixedArray::make(12, b'\x00'),
       })
   }
-  @raw.raw_map(
+  @raw.map(
     x,
     y,
     w,
@@ -482,7 +482,7 @@ fn encode_i32_le(buffer : FixedArray[Byte], offset : Int, value : Int) -> Unit {
 /// overlap. A negative length or a range outside TIC-80 RAM is ignored. This
 /// function does not copy MoonBit heap objects or `Bytes` values.
 pub fn memcpy(dest : Int, src : Int, length : Int) -> Unit {
-  @raw.raw_memcpy(dest, src, length)
+  @raw.memcpy(dest, src, length)
 }
 
 ///|
@@ -492,19 +492,19 @@ pub fn memcpy(dest : Int, src : Int, length : Int) -> Unit {
 /// is ignored. This function does not operate on MoonBit heap objects or
 /// `Bytes` values.
 pub fn memset(address : Int, value : Byte, length : Int) -> Unit {
-  @raw.raw_memset(address, value, length)
+  @raw.memset(address, value, length)
 }
 
 ///|
 /// Returns the tile ID at map coordinates `(x, y)`.
 pub fn mget(x : Int, y : Int) -> Int {
-  @raw.raw_mget(x, y)
+  @raw.mget(x, y)
 }
 
 ///|
 /// Sets the tile ID at map coordinates `(x, y)`.
 pub fn mset(x : Int, y : Int, tile_id : Int) -> Unit {
-  @raw.raw_mset(x, y, tile_id)
+  @raw.mset(x, y, tile_id)
 }
 
 ///|
@@ -526,7 +526,7 @@ pub(all) struct MouseState {
 /// Returns an independent snapshot of the current mouse state.
 pub fn mouse() -> MouseState {
   let buffer = FixedArray::make(9, b'\x00')
-  @raw.raw_mouse(buffer)
+  @raw.mouse(buffer)
   decode_mouse_state(buffer)
 }
 
@@ -582,7 +582,7 @@ pub fn music(
   speed? : Int = -1,
 ) -> Unit {
   check_music_track(track)
-  @raw.raw_music(track, frame, row, loop_, sustain, tempo, speed)
+  @raw.music(track, frame, row, loop_, sustain, tempo, speed)
 }
 
 ///|
@@ -597,19 +597,19 @@ fn check_music_track(track : Int) -> Unit {
 ///
 /// This does not stop sound effects started independently with `sfx`.
 pub fn music_stop() -> Unit {
-  @raw.raw_music(-1, -1, -1, false, false, -1, -1)
+  @raw.music(-1, -1, -1, false, false, -1, -1)
 }
 
 ///|
 /// Returns the color of a pixel.
 pub fn pix(x : Int, y : Int) -> Byte {
-  @raw.raw_pix(x, y, -1)
+  @raw.pix(x, y, -1)
 }
 
 ///|
 /// Draws a pixel.
 pub fn pix_set(x : Int, y : Int, color : Int) -> Unit {
-  ignore(@raw.raw_pix(x, y, color))
+  ignore(@raw.pix(x, y, color))
 }
 
 ///|
@@ -618,7 +618,7 @@ pub fn pix_set(x : Int, y : Int, color : Int) -> Unit {
 /// Returns zero when `address` is outside TIC-80 RAM. Use `peek4`, `peek2`, or
 /// `peek1` when the address is expressed in narrower units.
 pub fn peek(address : Int) -> Byte {
-  @raw.raw_peek(address, 8)
+  @raw.peek(address, 8)
 }
 
 ///|
@@ -628,7 +628,7 @@ pub fn peek(address : Int) -> Byte {
 /// and `2 * n + 1` select the low and high nibbles of byte `n`, respectively.
 /// Returns zero when the address is outside TIC-80 RAM.
 pub fn peek4(address : Int) -> Byte {
-  @raw.raw_peek4(address)
+  @raw.peek4(address)
 }
 
 ///|
@@ -638,7 +638,7 @@ pub fn peek4(address : Int) -> Byte {
 /// select the four fields of byte `n` from least to most significant. Returns
 /// zero when the address is outside TIC-80 RAM.
 pub fn peek2(address : Int) -> Byte {
-  @raw.raw_peek2(address)
+  @raw.peek2(address)
 }
 
 ///|
@@ -648,7 +648,7 @@ pub fn peek2(address : Int) -> Byte {
 /// bits of byte `n` from least to most significant. Returns zero when the
 /// address is outside TIC-80 RAM.
 pub fn peek1(address : Int) -> Byte {
-  @raw.raw_peek1(address)
+  @raw.peek1(address)
 }
 
 ///|
@@ -657,7 +657,7 @@ pub fn peek1(address : Int) -> Byte {
 /// `index` ranges from 0 through 255. Panics when it is outside that range.
 pub fn pmem(index : Int) -> UInt {
   check_pmem_index(index)
-  @raw.raw_pmem(index, -1L)
+  @raw.pmem(index, -1L)
 }
 
 ///|
@@ -666,7 +666,7 @@ pub fn pmem(index : Int) -> UInt {
 /// `index` ranges from 0 through 255. Panics when it is outside that range.
 pub fn pmem_set(index : Int, value : UInt) -> UInt {
   check_pmem_index(index)
-  @raw.raw_pmem(index, value.to_int64())
+  @raw.pmem(index, value.to_int64())
 }
 
 ///|
@@ -682,7 +682,7 @@ fn check_pmem_index(index : Int) -> Unit {
 /// Writes outside TIC-80 RAM are ignored. Use `poke4`, `poke2`, or `poke1`
 /// when the address is expressed in narrower units.
 pub fn poke(address : Int, value : Byte) -> Unit {
-  @raw.raw_poke(address, value.to_int(), 8)
+  @raw.poke(address, value.to_int(), 8)
 }
 
 ///|
@@ -691,7 +691,7 @@ pub fn poke(address : Int, value : Byte) -> Unit {
 /// `address` uses the nibble indexing described by `peek4`; only the low four
 /// bits of `value` are stored. Writes outside TIC-80 RAM are ignored.
 pub fn poke4(address : Int, value : Byte) -> Unit {
-  @raw.raw_poke4(address, value.to_int())
+  @raw.poke4(address, value.to_int())
 }
 
 ///|
@@ -700,7 +700,7 @@ pub fn poke4(address : Int, value : Byte) -> Unit {
 /// `address` uses the two-bit-field indexing described by `peek2`; only the
 /// low two bits of `value` are stored. Writes outside TIC-80 RAM are ignored.
 pub fn poke2(address : Int, value : Byte) -> Unit {
-  @raw.raw_poke2(address, value.to_int())
+  @raw.poke2(address, value.to_int())
 }
 
 ///|
@@ -709,7 +709,7 @@ pub fn poke2(address : Int, value : Byte) -> Unit {
 /// `address` uses the bit indexing described by `peek1`; only the lowest bit
 /// of `value` is stored. Writes outside TIC-80 RAM are ignored.
 pub fn poke1(address : Int, value : Byte) -> Unit {
-  @raw.raw_poke1(address, value.to_int())
+  @raw.poke1(address, value.to_int())
 }
 
 ///|
@@ -724,19 +724,19 @@ pub fn print(
   scale? : Int = 1,
   small_font? : Bool = false,
 ) -> Int {
-  @raw.raw_print(encode_c_text(text), x, y, color, fixed, scale, small_font)
+  @raw.print(encode_c_text(text), x, y, color, fixed, scale, small_font)
 }
 
 ///|
 /// Draws a filled rectangle at `(x, y)` with the given size.
 pub fn rect(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit {
-  @raw.raw_rect(x, y, w, h, color)
+  @raw.rect(x, y, w, h, color)
 }
 
 ///|
 /// Draws a one-pixel rectangle outline at `(x, y)` with the given size.
 pub fn rectb(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit {
-  @raw.raw_rectb(x, y, w, h, color)
+  @raw.rectb(x, y, w, h, color)
 }
 
 ///|
@@ -785,7 +785,7 @@ pub fn sfx(
     None => 8
     Some(speed) => speed
   }
-  @raw.raw_sfx(
+  @raw.sfx(
     id,
     raw_note,
     raw_octave,
@@ -802,7 +802,7 @@ pub fn sfx(
 ///
 /// This does not stop music playback or effects on the other channels.
 pub fn sfx_stop(channel? : SfxChannel = Channel0) -> Unit {
-  @raw.raw_sfx(-1, 0, 0, -1, channel.to_int(), 15, 15, 8)
+  @raw.sfx(-1, 0, 0, -1, channel.to_int(), 15, 15, 8)
 }
 
 ///|
@@ -838,7 +838,7 @@ pub fn spr(
   w? : Int = 1,
   h? : Int = 1,
 ) -> Unit {
-  @raw.raw_spr(
+  @raw.spr(
     id,
     x,
     y,
@@ -881,7 +881,7 @@ pub fn sync(
   bank? : Int = 0,
   to_cart? : Bool = false,
 ) -> Unit {
-  @raw.raw_sync(encode_sync_mask(sections), bank, to_cart)
+  @raw.sync(encode_sync_mask(sections), bank, to_cart)
 }
 
 ///|
@@ -892,20 +892,20 @@ fn encode_sync_mask(sections : ArrayView[SyncSection]) -> Int {
 ///|
 /// Returns the elapsed time in milliseconds since the cartridge started.
 pub fn time() -> Float {
-  @raw.raw_time()
+  @raw.time()
 }
 
 ///|
 /// Returns the current Unix timestamp in seconds.
 pub fn tstamp() -> UInt {
-  @raw.raw_tstamp()
+  @raw.tstamp()
 }
 
 ///|
 /// Writes ASCII text to the console. Panics if `text` contains a non-ASCII
 /// code unit.
 pub fn trace(text : StringView, color? : Int = -1) -> Unit {
-  @raw.raw_trace(encode_c_text(text), color)
+  @raw.trace(encode_c_text(text), color)
 }
 
 ///|
@@ -924,7 +924,7 @@ pub fn tri(
   y3 : Float,
   color : Int,
 ) -> Unit {
-  @raw.raw_tri(x1, y1, x2, y2, x3, y3, color)
+  @raw.tri(x1, y1, x2, y2, x3, y3, color)
 }
 
 ///|
@@ -938,7 +938,7 @@ pub fn trib(
   y3 : Float,
   color : Int,
 ) -> Unit {
-  @raw.raw_trib(x1, y1, x2, y2, x3, y3, color)
+  @raw.trib(x1, y1, x2, y2, x3, y3, color)
 }
 
 ///|
@@ -985,7 +985,7 @@ pub fn ttri(
   z3? : Float = 0.0,
   depth? : Bool = false,
 ) -> Unit {
-  @raw.raw_ttri(
+  @raw.ttri(
     x1,
     y1,
     x2,
@@ -1029,7 +1029,7 @@ fn VideoBank::to_int(self : VideoBank) -> Int = "%identity"
 /// Use `vbank_set` when subsequent drawing or direct VRAM operations should
 /// target a different bank.
 pub fn vbank() -> VideoBank {
-  decode_video_bank(@raw.raw_vbank(-1))
+  decode_video_bank(@raw.vbank(-1))
 }
 
 ///|
@@ -1041,7 +1041,7 @@ pub fn vbank() -> VideoBank {
 /// target. This only switches VRAM; it does not select a cartridge resource
 /// bank for `sync`.
 pub fn vbank_set(bank : VideoBank) -> VideoBank {
-  decode_video_bank(@raw.raw_vbank(bank.to_int()))
+  decode_video_bank(@raw.vbank(bank.to_int()))
 }
 
 ///|
