@@ -247,14 +247,14 @@ pub fn font(
 }
 
 ///|
-/// Draws NUL-terminated ASCII bytes using a custom raster font and returns the
-/// rendered width, without encoding or copying `text`.
+/// Draws ASCII bytes using a custom raster font and returns the rendered width,
+/// without ASCII encoding or validation.
 ///
 /// This is the low-overhead counterpart of `font`. The caller must ensure that
-/// `text` contains only ASCII bytes and ends with `b'\x00'`; an earlier NUL
-/// truncates the text, while a missing terminator may make TIC-80 read beyond
-/// the `Bytes` storage. The remaining arguments have the same meaning as in
-/// `font`.
+/// `text` contains only ASCII bytes. The wrapper appends the NUL terminator
+/// required by TIC-80 when it is missing; an already terminated value is passed
+/// without copying. An earlier NUL truncates the text. The remaining arguments
+/// have the same meaning as in `font`.
 pub fn font_ascii(
   text : Bytes,
   x : Int,
@@ -266,6 +266,7 @@ pub fn font_ascii(
   scale? : Int = -1,
   alt? : Bool = false,
 ) -> Int {
+  let text = terminate_c_text(text)
   @raw.font(
     text,
     x,
@@ -855,14 +856,14 @@ pub fn print(
 }
 
 ///|
-/// Draws NUL-terminated ASCII bytes using TIC-80's configured font and returns
-/// the rendered width, without encoding or copying `text`.
+/// Draws ASCII bytes using TIC-80's configured font and returns the rendered
+/// width, without ASCII encoding or validation.
 ///
 /// This is the low-overhead counterpart of `print`. The caller must ensure that
-/// `text` contains only ASCII bytes and ends with `b'\x00'`; an earlier NUL
-/// truncates the text, while a missing terminator may make TIC-80 read beyond
-/// the `Bytes` storage. The remaining arguments have the same meaning as in
-/// `print`.
+/// `text` contains only ASCII bytes. The wrapper appends the NUL terminator
+/// required by TIC-80 when it is missing; an already terminated value is passed
+/// without copying. An earlier NUL truncates the text. The remaining arguments
+/// have the same meaning as in `print`.
 pub fn print_ascii(
   text : Bytes,
   x? : Int = 0,
@@ -872,7 +873,7 @@ pub fn print_ascii(
   scale? : Int = 1,
   small_font? : Bool = false,
 ) -> Int {
-  @raw.print(text, x, y, color, fixed, scale, small_font)
+  @raw.print(terminate_c_text(text), x, y, color, fixed, scale, small_font)
 }
 
 ///|
@@ -1066,13 +1067,14 @@ pub fn[T] abort(message : StringView, color? : Int = -1) -> T {
 }
 
 ///|
-/// Writes a NUL-terminated ASCII message to the TIC-80 console and then panics,
-/// without encoding or copying `message`.
+/// Writes an ASCII message to the TIC-80 console and then panics, without ASCII
+/// encoding or validation.
 ///
 /// This is the low-overhead counterpart of `abort`. The caller must ensure that
-/// `message` contains only ASCII bytes and ends with `b'\x00'`; an earlier NUL
-/// truncates the message, while a missing terminator may make TIC-80 read beyond
-/// the `Bytes` storage. `color` has the same meaning and default as in `trace`.
+/// `message` contains only ASCII bytes. The wrapper appends the NUL terminator
+/// required by TIC-80 when it is missing; an already terminated value is passed
+/// without copying. An earlier NUL truncates the message. `color` has the same
+/// meaning and default as in `trace`.
 pub fn[T] abort_ascii(message : Bytes, color? : Int = -1) -> T {
   trace_ascii(message, color~)
   panic()
@@ -1106,20 +1108,30 @@ pub fn trace(text : StringView, color? : Int = -1) -> Unit {
 }
 
 ///|
-/// Writes NUL-terminated ASCII bytes to the TIC-80 console without encoding or
-/// copying `text`.
+/// Writes ASCII bytes to the TIC-80 console without ASCII encoding or
+/// validation.
 ///
 /// This is the low-overhead counterpart of `trace`. The caller must ensure that
-/// `text` contains only ASCII bytes and ends with `b'\x00'`; an earlier NUL
-/// truncates the text, while a missing terminator may make TIC-80 read beyond
-/// the `Bytes` storage. `color` has the same meaning and default as in `trace`.
+/// `text` contains only ASCII bytes. The wrapper appends the NUL terminator
+/// required by TIC-80 when it is missing; an already terminated value is passed
+/// without copying. An earlier NUL truncates the text. `color` has the same
+/// meaning and default as in `trace`.
 pub fn trace_ascii(text : Bytes, color? : Int = -1) -> Unit {
-  @raw.trace(text, color)
+  @raw.trace(terminate_c_text(text), color)
 }
 
 ///|
 fn encode_c_text(text : StringView) -> Bytes {
   @ascii.encode(text) + b"\x00"
+}
+
+///|
+fn terminate_c_text(text : Bytes) -> Bytes {
+  if text.length() > 0 && text[text.length() - 1] == b'\x00' {
+    text
+  } else {
+    text + b"\x00"
+  }
 }
 
 ///|

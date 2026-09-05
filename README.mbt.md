@@ -112,15 +112,15 @@ The free edition cannot load or save `.wasmp` text projects. It can still use `.
 
 ## Low-overhead ASCII text
 
-The regular `print`, `font`, `trace`, and `abort` functions accept `StringView` and encode it as ASCII for TIC-80. Cartridges that only use known ASCII byte strings can instead call `print_ascii`, `font_ascii`, `trace_ascii`, and `abort_ascii`. These variants avoid encoding and copying the text, allowing the linker to remove `ascii.encode` when none of the regular text functions are reachable.
+The regular `print`, `font`, `trace`, and `abort` functions accept `StringView` and encode it as ASCII for TIC-80. Cartridges that only use known ASCII byte strings can instead call `print_ascii`, `font_ascii`, `trace_ascii`, and `abort_ascii`. These variants avoid ASCII encoding and validation, allowing the linker to remove `ascii.encode` when none of the regular text functions are reachable.
 
-The `_ascii` variants accept `Bytes` directly and do not validate them. Every value must contain only ASCII bytes and end with an explicit NUL byte:
+The `_ascii` variants accept `Bytes` directly and do not validate them. Every value must contain only ASCII bytes; the wrapper supplies the NUL terminator required by TIC-80:
 
 ```mbt nocheck
-@tic80.print_ascii(b"SCORE\x00", x=8, y=8)
+@tic80.print_ascii(b"SCORE", x=8, y=8)
 ```
 
-An earlier NUL truncates the text. Omitting the terminator may make TIC-80 read beyond the `Bytes` storage. Use the regular `StringView` APIs unless cartridge size makes this lower-level contract worthwhile.
+When a value already ends with NUL, it is passed to TIC-80 without copying. Otherwise the wrapper creates a terminated copy. An earlier NUL truncates the text. Use the regular `StringView` APIs unless cartridge size makes this lower-level contract worthwhile.
 
 ## Video banks
 
