@@ -43,13 +43,18 @@ pub(all) enum Button {
 fn Button::to_int(self : Button) -> Int = "%identity"
 
 ///|
-/// Returns whether the selected gamepad button is currently held.
+/// Returns whether the selected gamepad button is currently pressed.
+///
+/// The result remains true for as long as the button is held. Use `btnp` when
+/// only a new press, or a controlled key-repeat style event, should be reported.
 pub fn btn(button : Button) -> Bool {
   @raw.btn(button.to_int()) != 0
 }
 
 ///|
-/// Returns whether any button on any gamepad is currently held.
+/// Returns whether any button on any of the four gamepads is currently pressed.
+///
+/// As with `btn`, the result remains true while at least one button is held.
 pub fn any_btn() -> Bool {
   @raw.btn(-1) != 0
 }
@@ -62,7 +67,10 @@ pub struct ButtonState {
 } derive(Debug, Eq)
 
 ///|
-/// Captures all four gamepads in one host call.
+/// Captures the current state of all four gamepads in one host call.
+///
+/// The returned value does not change as input changes; call `button_state`
+/// again to obtain a new snapshot.
 pub fn button_state() -> ButtonState {
   { bits: @raw.btn(-1).reinterpret_as_uint(), }
 }
@@ -80,62 +88,89 @@ pub fn ButtonState::any(self : ButtonState) -> Bool {
 }
 
 ///|
-/// Returns whether a button was newly pressed.
+/// Returns whether `button` was newly pressed, with optional repeat timing.
+///
+/// Without `hold` and `period`, this is true only when the button is pressed in
+/// the current frame but was not pressed in the previous frame. Both timing
+/// values are measured in 60 Hz ticks. After `hold` ticks, a still-held button
+/// produces another true result every `period` ticks. For example,
+/// `btnp(button, hold=120, period=6)` starts repeating after two seconds and
+/// then repeats ten times per second. Leaving both values at -1 disables repeat.
 pub fn btnp(button : Button, hold? : Int = -1, period? : Int = -1) -> Bool {
   @raw.btnp(button.to_int(), hold, period) != 0
 }
 
 ///|
-/// Returns whether any button was newly pressed.
+/// Returns whether any gamepad button was newly pressed since the previous
+/// frame. This convenience wrapper does not enable repeat timing.
 pub fn any_btnp() -> Bool {
   @raw.btnp(-1, -1, -1) != 0
 }
 
 ///|
-/// Sets the screen clipping rectangle.
+/// Restricts subsequent drawing to the rectangle at `(x, y)` with size
+/// `w` by `h`.
+///
+/// Pixels drawn outside this viewport are not visible. The clipping rectangle
+/// remains active until another call to `clip` or `clip_reset`.
 pub fn clip(x : Int, y : Int, w : Int, h : Int) -> Unit {
   @raw.clip(x, y, w, h)
 }
 
 ///|
-/// Restores the clipping rectangle to the full screen.
+/// Restores the clipping rectangle to the entire screen.
 pub fn clip_reset() -> Unit {
   @raw.clip(-1, -1, -1, -1)
 }
 
 ///|
-/// Clears the screen with a color.
+/// Clears the entire screen with `color`, which defaults to palette color 0.
 pub fn cls(color? : Int = 0) -> Unit {
   @raw.cls(color)
 }
 
 ///|
-/// Draws a filled circle centered at `(x, y)`.
+/// Draws a filled circle of `radius` in `color`, centered at `(x, y)`.
+///
+/// TIC-80 rasterizes the circle with the Bresenham algorithm. Use `circb` to
+/// draw only its circumference.
 pub fn circ(x : Int, y : Int, radius : Int, color : Int) -> Unit {
   @raw.circ(x, y, radius, color)
 }
 
 ///|
-/// Draws a one-pixel circle outline centered at `(x, y)`.
+/// Draws a one-pixel circle circumference of `radius` in `color`, centered at
+/// `(x, y)`.
+///
+/// TIC-80 rasterizes the circle with the Bresenham algorithm. Use `circ` for a
+/// filled circle.
 pub fn circb(x : Int, y : Int, radius : Int, color : Int) -> Unit {
   @raw.circb(x, y, radius, color)
 }
 
 ///|
-/// Draws a filled ellipse centered at `(x, y)` with the given semi-axes.
+/// Draws a filled ellipse in `color`, centered at `(x, y)` with horizontal and
+/// vertical radii `a` and `b`.
+///
+/// TIC-80 rasterizes the ellipse with the Bresenham algorithm. Use `ellib` to
+/// draw only its border.
 pub fn elli(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit {
   @raw.elli(x, y, a, b, color)
 }
 
 ///|
-/// Draws a one-pixel ellipse outline centered at `(x, y)` with the given
-/// semi-axes.
+/// Draws a one-pixel ellipse border in `color`, centered at `(x, y)` with
+/// horizontal and vertical radii `a` and `b`.
+///
+/// TIC-80 rasterizes the ellipse with the Bresenham algorithm. Use `elli` for
+/// a filled ellipse.
 pub fn ellib(x : Int, y : Int, a : Int, b : Int, color : Int) -> Unit {
   @raw.ellib(x, y, a, b, color)
 }
 
 ///|
-/// Stops the current cartridge and returns to the TIC-80 console.
+/// Interrupts cartridge execution and returns to the TIC-80 console after the
+/// current `TIC` callback ends.
 pub fn exit() -> Unit {
   @raw.exit()
 }
@@ -144,8 +179,9 @@ pub fn exit() -> Unit {
 /// Returns whether one of a sprite's eight user-defined flags is set.
 ///
 /// `sprite_id` ranges from 0 through 511 and `flag` ranges from 0 through 7.
-/// Flag meanings are defined by the cartridge. Panics when either argument is
-/// outside its valid range.
+/// Flag meanings are defined entirely by the cartridge; for example, a game
+/// might use one flag for solid tiles and another for hazards. Panics when
+/// either argument is outside its valid range.
 pub fn fget(sprite_id : Int, flag : Int) -> Bool {
   check_sprite_flag_args(sprite_id, flag)
   @raw.fget(sprite_id, flag) != 0
@@ -155,6 +191,8 @@ pub fn fget(sprite_id : Int, flag : Int) -> Bool {
 /// Sets or clears one of a sprite's eight user-defined flags.
 ///
 /// `sprite_id` ranges from 0 through 511 and `flag` ranges from 0 through 7.
+/// TIC-80 does not prescribe meanings for these flags: a cartridge might use
+/// flag 0 for invisible sprites or flag 6 for sprites that should be scaled.
 /// The change affects runtime RAM; use `sync` with the `Flags` section and
 /// `to_cart=true` to copy runtime flags back to a cartridge resource bank.
 /// Panics when either argument is outside its valid range.
@@ -174,9 +212,16 @@ fn check_sprite_flag_args(sprite_id : Int, flag : Int) -> Unit {
 }
 
 ///|
-/// Draws ASCII text with a custom raster font. Panics if `text` contains a
-/// non-ASCII code unit. Transparent colors are passed directly from
-/// `transparent_colors`.
+/// Draws ASCII text using a custom raster font stored in foreground sprites and
+/// returns the rendered width.
+///
+/// `char_width` and `char_height` select each glyph's dimensions, `fixed`
+/// selects fixed-width layout, `scale` enlarges the glyphs, and `alt` selects
+/// the alternate 128-character glyph set. Every palette index in
+/// `transparent_colors` is treated as transparent; an empty value draws the
+/// font opaquely. Use `print`
+/// for TIC-80's configured built-in font and `trace` for console output.
+/// Panics if `text` contains a non-ASCII code unit.
 pub fn font(
   text : StringView,
   x : Int,
@@ -307,31 +352,41 @@ pub(all) enum Key {
 fn Key::to_int(self : Key) -> Int = "%identity"
 
 ///|
-/// Returns whether the selected keyboard key is currently held.
+/// Returns whether the selected keyboard key is currently pressed.
+///
+/// The result remains true for as long as the key is held. Use `keyp` when only
+/// a new press, or a controlled key-repeat style event, should be reported.
 pub fn key(key : Key) -> Bool {
   @raw.key(key.to_int()) != 0
 }
 
 ///|
-/// Returns whether any keyboard key is currently held.
+/// Returns whether any keyboard key is currently pressed.
 pub fn any_key() -> Bool {
   @raw.key(-1) != 0
 }
 
 ///|
-/// Returns whether a key was newly pressed or repeated.
+/// Returns whether `key` was newly pressed, with optional repeat timing.
+///
+/// Without `hold` and `period`, this is true only when the key is pressed in the
+/// current frame but was not pressed in the previous frame. Both timing values
+/// are measured in 60 Hz ticks. After `hold` ticks, a still-held key produces
+/// another true result every `period` ticks. Leaving both values at -1 disables
+/// repeat. This is the keyboard counterpart of `btnp`.
 pub fn keyp(key : Key, hold? : Int = -1, period? : Int = -1) -> Bool {
   @raw.keyp(key.to_int(), hold, period) != 0
 }
 
 ///|
-/// Returns whether any keyboard key was newly pressed.
+/// Returns whether any keyboard key was newly pressed since the previous frame.
+/// This convenience wrapper does not enable repeat timing.
 pub fn any_keyp() -> Bool {
   @raw.keyp(-1, -1, -1) != 0
 }
 
 ///|
-/// Draws a straight line from `(x0, y0)` to `(x1, y1)`.
+/// Draws a straight line in `color` from `(x0, y0)` to `(x1, y1)`.
 pub fn line(
   x0 : Float,
   y0 : Float,
@@ -369,6 +424,9 @@ fn Rotation::to_int(self : Rotation) -> Int = "%identity"
 ///|
 /// The current tile state passed to a map remap callback, and the replacement
 /// state returned by it.
+///
+/// The callback may replace `tile_id`, apply a `flip`, apply a clockwise
+/// `rotate`, or return the value unchanged.
 #valtype
 pub(all) struct MapRemapResult {
   tile_id : Int
@@ -377,9 +435,25 @@ pub(all) struct MapRemapResult {
 } derive(Debug, Eq)
 
 ///|
-/// Draws a map region. When present, `remap` receives the current tile state
-/// and its map coordinates, and returns the state to draw. The callback must be
+/// Draws a rectangular region of TIC-80's tile map at a screen position.
+///
+/// The map contains 8 by 8 pixel cells and can be up to 240 cells wide by 136
+/// cells high. `(x, y)` is the first map cell, `(w, h)` is the region size in
+/// cells, and `(sx, sy)` is its destination in screen pixels. The effective
+/// defaults selected by -1 are `(x, y) = (0, 0)`, `(w, h) = (30, 17)`, and
+/// `scale = 1`. Every palette index in `transparent_colors` is skipped; an
+/// empty value draws tiles opaquely.
+///
+/// When present, `remap` receives the current tile state and its map
+/// coordinates, and returns the state to draw. It can replace, flip, rotate, or
+/// hide tiles for this draw without changing map RAM, which is useful for
+/// animated tiles, doors, and object-spawn markers. The callback must be
 /// capture-free because it is stored as a WebAssembly function reference.
+/// Use `mset` for persistent runtime-map changes.
+///
+/// Map cells are stored sequentially from byte address `0x08000`; adjacent
+/// rows are 240 bytes apart. For example, the cell below the top-left cell is
+/// at `0x08000 + 240`, or `0x080f0`.
 pub fn map(
   x? : Int = -1,
   y? : Int = -1,
@@ -480,7 +554,8 @@ fn encode_i32_le(buffer : FixedArray[Byte], offset : Int, value : Int) -> Unit {
 ///
 /// `dest` and `src` are byte addresses. The source and destination ranges may
 /// overlap. A negative length or a range outside TIC-80 RAM is ignored. This
-/// function does not copy MoonBit heap objects or `Bytes` values.
+/// function is useful for moving runtime sprites, maps, sounds, and other
+/// cartridge data, but does not copy MoonBit heap objects or `Bytes` values.
 pub fn memcpy(dest : Int, src : Int, length : Int) -> Unit {
   @raw.memcpy(dest, src, length)
 }
@@ -489,20 +564,24 @@ pub fn memcpy(dest : Int, src : Int, length : Int) -> Unit {
 /// Fills `length` bytes of TIC-80 RAM with `value`.
 ///
 /// `address` is a byte address. A negative length or a range outside TIC-80 RAM
-/// is ignored. This function does not operate on MoonBit heap objects or
-/// `Bytes` values.
+/// is ignored. This can modify any runtime resource represented in TIC-80 RAM,
+/// but does not operate on MoonBit heap objects or `Bytes` values.
 pub fn memset(address : Int, value : Byte, length : Int) -> Unit {
   @raw.memset(address, value, length)
 }
 
 ///|
-/// Returns the tile ID at map coordinates `(x, y)`.
+/// Returns the sprite ID stored at map coordinates `(x, y)`.
 pub fn mget(x : Int, y : Int) -> Int {
   @raw.mget(x, y)
 }
 
 ///|
-/// Sets the tile ID at map coordinates `(x, y)`.
+/// Changes the sprite ID at map coordinates `(x, y)` in runtime map RAM.
+///
+/// The change normally lasts only while the cartridge is running. To save it
+/// to a cartridge resource bank, call `sync` with the `Map` section and
+/// `to_cart=true`.
 pub fn mset(x : Int, y : Int, tile_id : Int) -> Unit {
   @raw.mset(x, y, tile_id)
 }
@@ -511,7 +590,8 @@ pub fn mset(x : Int, y : Int, tile_id : Int) -> Unit {
 /// A snapshot of the mouse cursor, wheel, and button state.
 ///
 /// `x` and `y` are screen coordinates. `scroll_x` and `scroll_y` are signed
-/// wheel movements for the current frame.
+/// wheel movements for the current frame. `left`, `middle`, and `right` report
+/// whether the corresponding button is pressed.
 pub(all) struct MouseState {
   x : Int
   y : Int
@@ -523,7 +603,8 @@ pub(all) struct MouseState {
 } derive(Debug, Eq)
 
 ///|
-/// Returns an independent snapshot of the current mouse state.
+/// Returns an independent snapshot of the current mouse coordinates, wheel
+/// movement, and button state.
 pub fn mouse() -> MouseState {
   let buffer = FixedArray::make(9, b'\x00')
   @raw.mouse(buffer)
@@ -601,13 +682,13 @@ pub fn music_stop() -> Unit {
 }
 
 ///|
-/// Returns the color of a pixel.
+/// Returns the palette color at screen coordinates `(x, y)`.
 pub fn pix(x : Int, y : Int) -> Byte {
   @raw.pix(x, y, -1)
 }
 
 ///|
-/// Draws a pixel.
+/// Sets the pixel at screen coordinates `(x, y)` to `color`.
 pub fn pix_set(x : Int, y : Int, color : Int) -> Unit {
   ignore(@raw.pix(x, y, color))
 }
@@ -654,7 +735,13 @@ pub fn peek1(address : Int) -> Byte {
 ///|
 /// Reads a value from a persistent-memory slot.
 ///
-/// `index` ranges from 0 through 255. Panics when it is outside that range.
+/// A cartridge has 256 unsigned 32-bit slots, suitable for high scores, level
+/// progress, achievements, and other small saved values. `index` ranges from 0
+/// through 255. Panics when it is outside that range.
+///
+/// By default the save is associated with the cartridge hash, so changing the
+/// cartridge can create a different save namespace. Set `saveid:` in cartridge
+/// metadata to keep a stable namespace across cartridge updates.
 pub fn pmem(index : Int) -> UInt {
   check_pmem_index(index)
   @raw.pmem(index, -1L)
@@ -663,7 +750,8 @@ pub fn pmem(index : Int) -> UInt {
 ///|
 /// Writes a persistent-memory slot and returns its previous value.
 ///
-/// `index` ranges from 0 through 255. Panics when it is outside that range.
+/// Values are unsigned 32-bit integers. `index` ranges from 0 through 255.
+/// Panics when it is outside that range. See `pmem` for save identity details.
 pub fn pmem_set(index : Int, value : UInt) -> UInt {
   check_pmem_index(index)
   @raw.pmem(index, value.to_int64())
@@ -713,8 +801,14 @@ pub fn poke1(address : Int, value : Byte) -> Unit {
 }
 
 ///|
-/// Draws ASCII text and returns its width. Panics if `text` contains a
-/// non-ASCII code unit.
+/// Draws ASCII text using TIC-80's configured font and returns its width.
+///
+/// When `fixed` is true, every character occupies an equal-width box, so a
+/// narrow glyph such as `i` advances by the same amount as `w`. When false,
+/// proportional glyph widths are used with one pixel of spacing. `scale`
+/// enlarges the text, and `small_font` selects TIC-80's small built-in font.
+/// Use `font` for a custom raster font or `trace` for console output. Panics if
+/// `text` contains a non-ASCII code unit.
 pub fn print(
   text : StringView,
   x? : Int = 0,
@@ -728,13 +822,15 @@ pub fn print(
 }
 
 ///|
-/// Draws a filled rectangle at `(x, y)` with the given size.
+/// Draws a filled rectangle in `color` at `(x, y)` with size `w` by `h`.
+/// Use `rectb` when only a one-pixel border is needed.
 pub fn rect(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit {
   @raw.rect(x, y, w, h, color)
 }
 
 ///|
-/// Draws a one-pixel rectangle outline at `(x, y)` with the given size.
+/// Draws a one-pixel rectangle border in `color` at `(x, y)` with size `w` by
+/// `h`. Use `rect` for a filled rectangle.
 pub fn rectb(x : Int, y : Int, w : Int, h : Int, color : Int) -> Unit {
   @raw.rectb(x, y, w, h, color)
 }
@@ -757,7 +853,10 @@ fn SfxChannel::to_int(self : SfxChannel) -> Int = "%identity"
 /// Plays one of the 64 effects created in TIC-80's SFX Editor.
 ///
 /// `note` is a combined note number from 0 through 95, with twelve notes per
-/// octave. When omitted, the note stored in the selected effect is used.
+/// octave. The values in each octave are C, C sharp, D, D sharp, E, F, F sharp,
+/// G, G sharp, A, A sharp, and B; flat names are not represented separately.
+/// For example, 14 is D in the second octave. When `note` is omitted, the note
+/// stored in the selected effect is used.
 /// `duration` is measured in 60 Hz ticks; -1 plays continuously. The left and
 /// right volumes range from 0 through 15. When `speed` is omitted, the speed
 /// stored in the selected effect is used; explicit speeds range from -4 through
@@ -826,7 +925,13 @@ fn split_sfx_note(note : Int) -> (Int, Int) {
 }
 
 ///|
-/// Transparent colors are passed directly from `transparent_colors`.
+/// Draws a sprite, or a rectangular region of sprites, at `(x, y)`.
+///
+/// `id` selects the top-left sprite. `w` and `h` select a composite rectangular
+/// region in sprite units. `scale = 2`, for example, draws each 8 by 8 sprite
+/// in a 16 by 16 pixel area. `flip` mirrors the result and `rotate` rotates it
+/// clockwise in 90-degree steps. Every palette index in
+/// `transparent_colors` is skipped; an empty value draws the sprite opaquely.
 pub fn spr(
   id : Int,
   x : Int,
@@ -875,7 +980,14 @@ fn SyncSection::to_int(self : SyncSection) -> Int = "%identity"
 /// Synchronizes cartridge resources with runtime memory. An empty `sections`
 /// list selects every section. By default, data is copied from bank 0 into
 /// runtime memory; set `to_cart` to copy runtime data back to the bank. Each
-/// section can only be synchronized once per frame.
+/// call transfers the requested tiles, sprites, map, sound effects, music,
+/// palette, flags, and/or screen data.
+///
+/// TIC-80 Pro cartridges provide eight resource banks. Each resource section
+/// can be synchronized at most once per frame; later calls in the same frame
+/// may still transfer sections not selected earlier. Calling `sync(bank=0)`
+/// with no sections restores all runtime resources from bank 0. Cartridge code
+/// is not loaded by `sync`; TIC-80 handles code-bank loading automatically.
 pub fn sync(
   sections? : ArrayView[SyncSection] = [],
   bank? : Int = 0,
@@ -891,19 +1003,27 @@ fn encode_sync_mask(sections : ArrayView[SyncSection]) -> Int {
 
 ///|
 /// Returns the elapsed time in milliseconds since the cartridge started.
+///
+/// This is useful for animation, elapsed-time tracking, and timed events.
 pub fn time() -> Float {
   @raw.time()
 }
 
 ///|
 /// Returns the current Unix timestamp in seconds.
+///
+/// The timestamp counts seconds since 1970-01-01 00:00:00 UTC and can be used
+/// for cartridge state that evolves between play sessions.
 pub fn tstamp() -> UInt {
   @raw.tstamp()
 }
 
 ///|
-/// Writes ASCII text to the console. Panics if `text` contains a non-ASCII
-/// code unit.
+/// Writes ASCII text to the TIC-80 console in `color`.
+///
+/// This is intended for debugging. The default color is palette color 15; use
+/// the console's `cls` command to clear accumulated trace output. Panics if
+/// `text` contains a non-ASCII code unit.
 pub fn trace(text : StringView, color? : Int = -1) -> Unit {
   @raw.trace(encode_c_text(text), color)
 }
@@ -914,7 +1034,7 @@ fn encode_c_text(text : StringView) -> Bytes {
 }
 
 ///|
-/// Draws a filled triangle with the given vertices.
+/// Draws a triangle filled with `color` using the three supplied vertices.
 pub fn tri(
   x1 : Float,
   y1 : Float,
@@ -928,7 +1048,8 @@ pub fn tri(
 }
 
 ///|
-/// Draws a one-pixel triangle outline with the given vertices.
+/// Draws a one-pixel triangle border in `color` using the three supplied
+/// vertices.
 pub fn trib(
   x1 : Float,
   y1 : Float,
@@ -961,10 +1082,17 @@ fn TextureSource::to_int(self : TextureSource) -> Int = "%identity"
 /// Draws a triangle textured from `texture_source`.
 ///
 /// The `u` and `v` coordinates are interpreted in the coordinate space of the
-/// selected source. When `OtherVideoBank` is selected, `ttri` samples whichever
-/// video bank is not currently selected: it normally samples `Bank1` while
-/// drawing to `Bank0`, and samples `Bank0` while drawing to `Bank1`.
-/// Transparent colors are passed directly from `transparent_colors`.
+/// selected source. Image RAM and map RAM are treated as single large images,
+/// and the coordinates address pixels rather than sprite IDs. For example, the
+/// top-left corner of sprite 2 is at `(u, v) = (16, 0)`.
+///
+/// `z1`, `z2`, and `z3` provide per-vertex depth for perspective correction;
+/// triangles whose vertices have different depths can otherwise appear
+/// distorted. Set `depth` to use TIC-80's depth buffer. When `OtherVideoBank`
+/// is selected, `ttri` samples whichever video bank is not currently selected:
+/// it normally samples `Bank1` while drawing to `Bank0`, and samples `Bank0`
+/// while drawing to `Bank1`. Every palette index in `transparent_colors` is
+/// skipped; an empty value draws the texture opaquely.
 pub fn ttri(
   x1 : Float,
   y1 : Float,
