@@ -1002,6 +1002,17 @@ fn encode_sync_mask(sections : ArrayView[SyncSection]) -> Int {
 }
 
 ///|
+/// Writes an ASCII message to the TIC-80 console and then panics.
+///
+/// This is useful for reporting a fatal error before trapping the cartridge.
+/// `color` has the same meaning and default as in `trace`. Panics while
+/// encoding the message if it contains a non-ASCII code unit.
+pub fn[T] abort(message : StringView, color? : Int = -1) -> T {
+  trace(message, color~)
+  panic()
+}
+
+///|
 /// Returns the elapsed time in milliseconds since the cartridge started.
 ///
 /// This is useful for animation, elapsed-time tracking, and timed events.

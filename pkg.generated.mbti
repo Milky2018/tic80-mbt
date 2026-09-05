@@ -6,6 +6,8 @@ import {
 }
 
 // Values
+pub fn[T] abort(StringView, color? : Int) -> T
+
 pub fn any_btn() -> Bool
 
 pub fn any_btnp() -> Bool
