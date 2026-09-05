@@ -110,6 +110,18 @@ tic80 --cli --fs . --cmd 'load game.wasmp & import binary _build/wasm/release/bu
 
 The free edition cannot load or save `.wasmp` text projects. It can still use `.tic` cartridges: create one with `new wasm`, import the compiled binary, save it as `game.tic`, and subsequently load that `.tic` file before importing newer builds.
 
+## Low-overhead ASCII text
+
+The regular `print`, `font`, `trace`, and `abort` functions accept `StringView` and encode it as ASCII for TIC-80. Cartridges that only use known ASCII byte strings can instead call `print_ascii`, `font_ascii`, `trace_ascii`, and `abort_ascii`. These variants avoid encoding and copying the text, allowing the linker to remove `ascii.encode` when none of the regular text functions are reachable.
+
+The `_ascii` variants accept `Bytes` directly and do not validate them. Every value must contain only ASCII bytes and end with an explicit NUL byte:
+
+```mbt nocheck
+@tic80.print_ascii(b"SCORE\x00", x=8, y=8)
+```
+
+An earlier NUL truncates the text. Omitting the terminator may make TIC-80 read beyond the `Bytes` storage. Use the regular `StringView` APIs unless cartridge size makes this lower-level contract worthwhile.
+
 ## Video banks
 
 TIC-80 provides two 16 KiB video-memory banks, represented by `VideoBank`. Drawing commands and direct access to VRAM operate on the currently selected bank. `Bank1` is composited over `Bank0`; pixels matching `Bank1`'s clear color are transparent and reveal `Bank0` underneath.

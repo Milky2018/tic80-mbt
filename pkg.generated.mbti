@@ -8,6 +8,8 @@ import {
 // Values
 pub fn[T] abort(StringView, color? : Int) -> T
 
+pub fn[T] abort_ascii(Bytes, color? : Int) -> T
+
 pub fn any_btn() -> Bool
 
 pub fn any_btnp() -> Bool
@@ -41,6 +43,8 @@ pub fn exit() -> Unit
 pub fn fget(Int, Int) -> Bool
 
 pub fn font(StringView, Int, Int, transparent_colors? : Bytes, char_width? : Int, char_height? : Int, fixed? : Bool, scale? : Int, alt? : Bool) -> Int
+
+pub fn font_ascii(Bytes, Int, Int, transparent_colors? : Bytes, char_width? : Int, char_height? : Int, fixed? : Bool, scale? : Int, alt? : Bool) -> Int
 
 pub fn fset(Int, Int, Bool) -> Unit
 
@@ -92,6 +96,8 @@ pub fn poke4(Int, Byte) -> Unit
 
 pub fn print(StringView, x? : Int, y? : Int, color? : Int, fixed? : Bool, scale? : Int, small_font? : Bool) -> Int
 
+pub fn print_ascii(Bytes, x? : Int, y? : Int, color? : Int, fixed? : Bool, scale? : Int, small_font? : Bool) -> Int
+
 pub fn rect(Int, Int, Int, Int, Int) -> Unit
 
 pub fn rectb(Int, Int, Int, Int, Int) -> Unit
@@ -107,6 +113,8 @@ pub fn sync(sections? : ArrayView[SyncSection], bank? : Int, to_cart? : Bool) ->
 pub fn time() -> Float
 
 pub fn trace(StringView, color? : Int) -> Unit
+
+pub fn trace_ascii(Bytes, color? : Int) -> Unit
 
 pub fn tri(Float, Float, Float, Float, Float, Float, Int) -> Unit
 

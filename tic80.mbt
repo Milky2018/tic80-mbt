@@ -233,8 +233,41 @@ pub fn font(
   scale? : Int = -1,
   alt? : Bool = false,
 ) -> Int {
-  @raw.font(
+  font_ascii(
     encode_c_text(text),
+    x,
+    y,
+    transparent_colors~,
+    char_width~,
+    char_height~,
+    fixed~,
+    scale~,
+    alt~,
+  )
+}
+
+///|
+/// Draws NUL-terminated ASCII bytes using a custom raster font and returns the
+/// rendered width, without encoding or copying `text`.
+///
+/// This is the low-overhead counterpart of `font`. The caller must ensure that
+/// `text` contains only ASCII bytes and ends with `b'\x00'`; an earlier NUL
+/// truncates the text, while a missing terminator may make TIC-80 read beyond
+/// the `Bytes` storage. The remaining arguments have the same meaning as in
+/// `font`.
+pub fn font_ascii(
+  text : Bytes,
+  x : Int,
+  y : Int,
+  transparent_colors? : Bytes = b"",
+  char_width? : Int = -1,
+  char_height? : Int = -1,
+  fixed? : Bool = false,
+  scale? : Int = -1,
+  alt? : Bool = false,
+) -> Int {
+  @raw.font(
+    text,
     x,
     y,
     transparent_colors,
@@ -818,7 +851,28 @@ pub fn print(
   scale? : Int = 1,
   small_font? : Bool = false,
 ) -> Int {
-  @raw.print(encode_c_text(text), x, y, color, fixed, scale, small_font)
+  print_ascii(encode_c_text(text), x~, y~, color~, fixed~, scale~, small_font~)
+}
+
+///|
+/// Draws NUL-terminated ASCII bytes using TIC-80's configured font and returns
+/// the rendered width, without encoding or copying `text`.
+///
+/// This is the low-overhead counterpart of `print`. The caller must ensure that
+/// `text` contains only ASCII bytes and ends with `b'\x00'`; an earlier NUL
+/// truncates the text, while a missing terminator may make TIC-80 read beyond
+/// the `Bytes` storage. The remaining arguments have the same meaning as in
+/// `print`.
+pub fn print_ascii(
+  text : Bytes,
+  x? : Int = 0,
+  y? : Int = 0,
+  color? : Int = 15,
+  fixed? : Bool = false,
+  scale? : Int = 1,
+  small_font? : Bool = false,
+) -> Int {
+  @raw.print(text, x, y, color, fixed, scale, small_font)
 }
 
 ///|
@@ -1008,7 +1062,19 @@ fn encode_sync_mask(sections : ArrayView[SyncSection]) -> Int {
 /// `color` has the same meaning and default as in `trace`. Panics while
 /// encoding the message if it contains a non-ASCII code unit.
 pub fn[T] abort(message : StringView, color? : Int = -1) -> T {
-  trace(message, color~)
+  abort_ascii(encode_c_text(message), color~)
+}
+
+///|
+/// Writes a NUL-terminated ASCII message to the TIC-80 console and then panics,
+/// without encoding or copying `message`.
+///
+/// This is the low-overhead counterpart of `abort`. The caller must ensure that
+/// `message` contains only ASCII bytes and ends with `b'\x00'`; an earlier NUL
+/// truncates the message, while a missing terminator may make TIC-80 read beyond
+/// the `Bytes` storage. `color` has the same meaning and default as in `trace`.
+pub fn[T] abort_ascii(message : Bytes, color? : Int = -1) -> T {
+  trace_ascii(message, color~)
   panic()
 }
 
@@ -1036,7 +1102,19 @@ pub fn tstamp() -> UInt {
 /// the console's `cls` command to clear accumulated trace output. Panics if
 /// `text` contains a non-ASCII code unit.
 pub fn trace(text : StringView, color? : Int = -1) -> Unit {
-  @raw.trace(encode_c_text(text), color)
+  trace_ascii(encode_c_text(text), color~)
+}
+
+///|
+/// Writes NUL-terminated ASCII bytes to the TIC-80 console without encoding or
+/// copying `text`.
+///
+/// This is the low-overhead counterpart of `trace`. The caller must ensure that
+/// `text` contains only ASCII bytes and ends with `b'\x00'`; an earlier NUL
+/// truncates the text, while a missing terminator may make TIC-80 read beyond
+/// the `Bytes` storage. `color` has the same meaning and default as in `trace`.
+pub fn trace_ascii(text : Bytes, color? : Int = -1) -> Unit {
+  @raw.trace(text, color)
 }
 
 ///|
